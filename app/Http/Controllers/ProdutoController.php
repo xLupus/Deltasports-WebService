@@ -64,4 +64,11 @@ class ProdutoController extends Controller
     {
         //
     }
+
+    public function pesquisa(Request $request)
+    {
+        $query = $request->input('query');
+        $produto = Produto::where('name', 'like', '%'.$query.'%')->get();
+        return view('produto.pesquisa', ['produto' => $produto]);
+    }
 }

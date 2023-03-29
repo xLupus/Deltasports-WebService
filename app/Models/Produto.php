@@ -15,8 +15,25 @@ class Produto extends Model
 
     public $timestamps = false;
 
-    public function categoria() {
+    public function categoria()
+    {
         return $this->belongsTo(Categoria::class, 'CATEGORIA_ID');
     }
 
+    public static function ativos()
+    {
+        return Produto::where('PRODUTO_ATIVO', TRUE)
+                              ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)->get();
+    }
+
+    public function imagens()
+    {
+        return $this->hasMany(ProdutoImagem::class, 'PRODUTO_ID')->orderBy('IMAGEM_ORDEM', 'ASC');
+    }
+
+    public function estoque()
+    {
+        return $this->belongsTo(ProdutoEstoque::class, 'PRODUTO_ID');
+    }
+    
 }

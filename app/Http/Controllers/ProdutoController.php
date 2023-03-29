@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produto;
 use Illuminate\Http\Request;
+use App\Models\Produto;
 
 class ProdutoController extends Controller
 {
@@ -12,55 +12,19 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        $products = Produto::all();
+        $products = Produto::with(['categoria', 'imagens', 'estoque'])
+                                  ->where('PRODUTO_ATIVO', TRUE)
+                                  ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0)
+                                  ->get();
 
         return response()->json($products);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      */
     public function show(Produto $produto)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Produto $produto)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Produto $produto)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Produto $produto)
     {
         //
     }

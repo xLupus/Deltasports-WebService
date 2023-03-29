@@ -69,6 +69,7 @@ class ProdutoController extends Controller
     {
         $query = $request->input('query');
         $produto = Produto::where('name', 'like', '%'.$query.'%')->get();
+        // return reponse()->json(['Produtos'=>$produto],200);
         return view('produto.pesquisa', ['produto' => $produto]);
     }
 }

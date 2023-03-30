@@ -12,7 +12,7 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        $products = Produto::ativos();
+        $products = Produto::ativos()->get();
 
         return response()->json([
             "status"    => 200,
@@ -39,11 +39,11 @@ class ProdutoController extends Controller
         ]);
     }
 
-    public function pesquisa(Request $request)
+    public function search(Request $request)
     {
-        $query = $request->input('query');
-        $produto = Produto::where('name', 'like', '%'.$query.'%')->get();
-        // return reponse()->json(['Produtos'=>$produto],200);
-        return view('produto.pesquisa', ['produto' => $produto]);
+        $query = $request->name;
+        $produto = Produto::ativos()->where('PRODUTO_NOME', 'like', '%'.$query.'%')->get();
+        return response()->json(['Produtos'=>$produto],200);
+        // return view('produto.search', ['produto' => $produto]);
     }
 }

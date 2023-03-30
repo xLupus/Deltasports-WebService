@@ -13,27 +13,30 @@ class Produto extends Model
 
     protected $primaryKey = 'PRODUTO_ID';
 
-    public $timestamps = false;
+    public $timestamps = false; 
+
+    public static function ativos()
+    {
+        return Produto::with(['imagens', 'estoque'])
+                            ->where('PRODUTO_ATIVO', TRUE)
+                            ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)
+                            ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0)
+                            ->get();
+    }
 
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'CATEGORIA_ID');
     }
 
-    public static function ativos()
-    {
-        return Produto::where('PRODUTO_ATIVO', TRUE)
-                              ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)->get();
-    }
-
     public function imagens()
     {
-        return $this->hasMany(ProdutoImagem::class, 'PRODUTO_ID')->orderBy('IMAGEM_ORDEM', 'ASC');
+        return $this->hasMany(ProdutoImagem::class, 'PRODUTO_ID')
+                    ->orderBy('IMAGEM_ORDEM', 'ASC');
     }
 
     public function estoque()
     {
         return $this->belongsTo(ProdutoEstoque::class, 'PRODUTO_ID');
     }
-    
 }

@@ -18,10 +18,9 @@ class Produto extends Model
     public static function ativos()
     {
         return Produto::with(['categoria', 'imagens', 'estoque'])
-                            ->where('PRODUTO_ATIVO', TRUE)
+                            ->where('PRODUTO_ATIVO', TRUE)                            
                             ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)
-                            ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0)
-                            ->get();
+                            ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0);
     }
 
     public function categoria()

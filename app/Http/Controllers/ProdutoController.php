@@ -12,7 +12,7 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        $products = Produto::ativos();
+        $products = Produto::ativos()->get();
 
         return response()->json([
             "status"    => 200,

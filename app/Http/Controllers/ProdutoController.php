@@ -29,11 +29,8 @@ class ProdutoController extends Controller
     {
         $productId = $request->id;
         
-        $product = Produto::with(['categoria', 'imagens', 'estoque'])
-                                ->where('PRODUTO_ATIVO', TRUE)
-                                ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0)
-                                ->where('PRODUTO_ID', $productId)
-                                ->get();
+        $product = Produto::ativos()->where('PRODUTO_ID', $productId)
+                                    ->first();
 
         return response()->json([
             "status"    => 200,

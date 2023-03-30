@@ -15,7 +15,9 @@ class Categoria extends Model
 
     public $timestamps = false;
 
-    public function produtos() {
-        return $this->hasMany(Produto::class, 'CATEGORIA_ID')->where('PRODUTO_ATIVO', TRUE);
+    public function produtos()
+    {
+        return $this->hasMany(Produto::class, 'CATEGORIA_ID')
+                    ->where('PRODUTO_ATIVO', TRUE);
     }
 }

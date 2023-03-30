@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produto;
 use Illuminate\Http\Request;
+use App\Models\Produto;
 
 class ProdutoController extends Controller
 {
@@ -12,64 +12,30 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        $products = Produto::all();
+        $products = Produto::ativos();
 
-        return response()->json($products);
+        return response()->json([
+            "status"    => 200,
+            "message"   => "Todos os produtos",
+            "products"  => $products
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
      */
-    public function show(Produto $produto)
+    public function show(Request $request)
     {
-        //
-    }
+        $productId = $request->id;
+        
+        $product = Produto::ativos()->where('PRODUTO_ID', $productId)
+                                    ->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Produto $produto)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Produto $produto)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Produto $produto)
-    {
-        //
-    }
-
-    public function pesquisa(Request $request)
-    {
-        $query = $request->input('query');
-        $produto = Produto::where('name', 'like', '%'.$query.'%')->get();
-        // return reponse()->json(['Produtos'=>$produto],200);
-        return view('produto.pesquisa', ['produto' => $produto]);
+        return response()->json([
+            "status"    => 200,
+            "message"   => null,
+            "product"   => $product
+        ]);
     }
 }

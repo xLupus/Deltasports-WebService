@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Api\ProdutoResource;
 use Illuminate\Http\Request;
 use App\Models\Produto;
 
@@ -12,12 +13,12 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        $products = Produto::ativos();
-
+        $products = Produto::ativos()->get();
+        
         return response()->json([
             "status"    => 200,
             "message"   => "Todos os produtos",
-            "products"  => $products
+            "products"  => ProdutoResource::collection($products)
         ]);
     }
 
@@ -30,12 +31,12 @@ class ProdutoController extends Controller
         $productId = $request->id;
         
         $product = Produto::ativos()->where('PRODUTO_ID', $productId)
-                                    ->first();
+                                    ->get();
 
         return response()->json([
             "status"    => 200,
             "message"   => null,
-            "product"   => $product
+            "product"   => ProdutoResource::collection($product) //Enter pq new n foi
         ]);
     }
 }

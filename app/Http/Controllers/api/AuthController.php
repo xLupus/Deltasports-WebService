@@ -17,12 +17,13 @@ class AuthController extends Controller
 
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
-            'nome'                  => 'required|string|max:50|not_regex:/[^A-Za-z0-9]/',
+            'name'                  => 'required|string|max:50|not_regex:/[^A-Za-z]/',
             'email'                 => 'required|string|email:rfc,dns|unique:USUARIO,USUARIO_EMAIL',
-            'senha'                 => 'required|string|confirmed|min:8',
-            'senha_confirmation'    => 'required|string|min:8',
+            'password'              => 'required|string|confirmed|min:8',
+            'password_confirmation' => 'required|string|min:8',
             'cpf'                   => 'required|string|digits_between:11,11|unique:USUARIO,USUARIO_CPF'
         ], [
+            'max'                   => 'Máximo de caracteres excedido',
             'required'              => 'Preencha este campo.',
             'not_regex'             => 'O campo informado não aceita números e símbolos.',
             'min'                   => 'O campo informado deve ter no mínimo 8 digitos.',
@@ -35,38 +36,38 @@ class AuthController extends Controller
 
         if($validator->fails()) {
             return response()->json([
-                'Status' => 500,
-                'Message' => $validator->messages(),
-                'Data' => null
+                'status' => 500,
+                'message' => $validator->messages(),
+                'data' => null
             ], 500);
         }
 
         try {
             $user = User::create([
-                'USUARIO_NOME'  => $request['nome'],
+                'USUARIO_NOME'  => $request['name'],
                 'USUARIO_EMAIL' => $request['email'],
-                'USUARIO_SENHA' => Hash::make($request['senha']),
+                'USUARIO_SENHA' => Hash::make($request['password']),
                 'USUARIO_CPF'   => $request['cpf'],
             ]);
 
             return response()->json([
-                'Status' => 200,
-                'Message' => 'Usuário cadastrado com sucesso!',
-                'Data' => $user
+                'status' => 200,
+                'message' => 'Usuário cadastrado com sucesso!',
+                'data' => $user
             ], 200);
         } catch (\Throwable $err) {
             return response()->json([
-                'Status' => 500,
-                'Message' => 'Erro ao cadastrar usuário!',
-                'Data' => null
+                'status' => 500,
+                'message' => 'Erro ao cadastrar usuário!',
+                'data' => null
             ], 500);
         }
     }
 
     public function login(Request $request) {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email:rfc,dns',
-            'senha' => 'required|string|min:8',
+            'email'     => 'required|string|email:rfc,dns',
+            'password'  => 'required|string|min:8',
         ], [
             'required'      => 'Preencha este campo.',
             'email'         => 'Formato de E-mail inválido.',
@@ -75,40 +76,40 @@ class AuthController extends Controller
 
         if($validator->fails()) {
             return response()->json([
-                'Status' => 500,
-                'Message' => $validator->messages(),
-                'Data' => null
+                'status' => 500,
+                'message' => $validator->messages(),
+                'data' => null
             ], 500);
         }
 
-        $data = $request->only('email', 'senha'); //mostra os dados
-        $credentials = ['USUARIO_EMAIL' => $request['email'], 'password' => $request['senha']]; //nome da coluna aqui deve ser 'password' para funcionar (**MUDAR APENAS NA MODEL**)
+        $data = $request->only('email', 'password'); //mostra os dados
+        $credentials = ['USUARIO_EMAIL' => $request['email'], 'password' => $request['password']]; //nome da coluna aqui deve ser 'password' para funcionar (**MUDAR APENAS NA MODEL**)
 
         try {
             if(! $token = Auth::attempt($credentials)) {
                 return response()->json([
-                    'Status'    => 401,
-                    'Message'   => 'Email ou senha incorretos.',
-                    'Data'      => $data
+                    'status'    => 401,
+                    'message'   => 'Email ou senha incorretos.',
+                    'data'      => $data
                 ], 401);
             }
         } catch (\Throwable $err) {
             return response()->json([
-                'Status'    => 500,
-                'Message'   => 'Falha ao logar.',
-                'Data'      => $data
+                'status'    => 500,
+                'message'   => 'Falha ao logar.',
+                'data'      => $data
             ], 500);
         }
 
         $user = Auth::user();
 
         return response()->json([
-            'Status' => 200,
-            'Message' => 'Usuário logado com sucesso!',
-            'Data' => $user,
-            'Authorisation' => [
-                'Token' => $token,
-                'Type' => 'bearer',
+            'status' => 200,
+            'message' => 'Usuário logado com sucesso!',
+            'data' => $user,
+            'authorisation' => [
+                'token' => $token,
+                'type' => 'bearer',
             ]
         ], 200);
     }
@@ -118,27 +119,27 @@ class AuthController extends Controller
             $user = Auth::logout();
 
             return response()->json([
-                'Status'    => 200,
-                'Message'   => 'Usuário deslogado com sucesso!',
-                'Data'      => $user
+                'status'    => 200,
+                'message'   => 'Usuário deslogado com sucesso!',
+                'data'      => $user
             ], 200);
         } catch (\Throwable $err) {
             return response()->json([
-                'Status'    => 500,
-                'Message'   => 'Erro ao deslogar usuário.',
-                'Data'      => null
+                'status'    => 500,
+                'message'   => 'Erro ao deslogar usuário.',
+                'data'      => null
             ], 500);
         }
     }
 
     public function refresh() {
         return response()->json([
-            'Status' => 200,
-            'Message' => 'Token revalidado com sucesso!',
-            'Data' => Auth::user(),
-            'Authorisation' => [
-                'Token' => Auth::refresh(),
-                'Type' => 'bearer',
+            'status' => 200,
+            'message' => 'Token revalidado com sucesso!',
+            'data' => Auth::user(),
+            'authorisation' => [
+                'token' => Auth::refresh(),
+                'type' => 'bearer',
             ]
         ], 200);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Models\Categoria;
+use App\Models\Produto;
 use App\Http\Controllers\Controller;
 
 class CategoriaController extends Controller
@@ -13,9 +14,7 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        $categories = Categoria::where('CATEGORIA_ATIVO', TRUE)
-                                ->whereRelation('produtos', 'PRODUTO_ATIVO', TRUE)
-                                ->get();
+        $categories = Categoria::ativos()->get();
 
         return response()->json([
             "status"     => 200,
@@ -27,9 +26,10 @@ class CategoriaController extends Controller
     /**
      * Display the products from a specified resource.
      */
-    public function show(Categoria $categoria)
+    public function showProducts(Request $request)
     {
-        //
+        $categoriaId = $request->id;
+        $produtos = Produto::ativos()->where('CATEGORIA_ID', $categoriaId)->get();
+        return response()->json(["produtos" => $produtos]);
     }
-
 }

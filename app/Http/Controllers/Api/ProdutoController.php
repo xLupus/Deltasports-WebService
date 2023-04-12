@@ -15,7 +15,7 @@ class ProdutoController extends Controller
     public function index()
     {
         $products = Produto::ativos()->get();
-        
+
         return response()->json([
             "status"    => 200,
             "message"   => "Todos os produtos",
@@ -30,7 +30,7 @@ class ProdutoController extends Controller
     public function show(Request $request)
     {
         $productId = $request->id;
-        
+
         $product = Produto::ativos()->where('PRODUTO_ID', $productId)
                                     ->get();
 
@@ -39,5 +39,13 @@ class ProdutoController extends Controller
             "message"   => null,
             "product"   => ProdutoResource::collection($product) //Enter pq new n foi
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->name;
+        $produto = Produto::ativos()->where('PRODUTO_NOME', 'like', '%'.$query.'%')->get();
+        return response()->json(['Produtos'=>$produto],200);
+        // return view('produto.search', ['produto' => $produto]);
     }
 }

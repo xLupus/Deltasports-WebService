@@ -1,30 +1,24 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\api\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProdutoController;
-use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\Api\ProdutoController;
+use App\Http\Controllers\Api\CategoriaController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::controller(AuthController::class)->group(function () {
+    Route::post('auth/register', 'register');
+    Route::post('auth/login', 'login');
+    Route::post('auth/logout', 'logout');
+    Route::post('auth/refresh', 'refresh');
 });
 
-Route::controller(ProdutoController::class);
+Route::controller(ProdutoController::class)->group(function () {
+    Route::get('/products', 'index');
+    Route::get('/product/{id}', 'show');
+    Route::get('/product/search/{name}', 'search');
+});
 
-Route::get('/products', [ProdutoController::class, 'index']);
-Route::get('/product/{id}', [ProdutoController::class, 'show']);
-Route::get('/product/search/{name}', [ProdutoController::class, 'search']);
-
-Route::get('/categories', [CategoriaController::class, 'index']);
-Route::get('/category/{id}/products', [CategoriaController::class, 'showProducts']);
+Route::controller(CategoriaController::class)->group(function () {
+    Route::get('/categories', 'index');
+    Route::get('/category/{id}/products', 'showProducts');
+});

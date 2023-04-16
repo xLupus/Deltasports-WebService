@@ -27,6 +27,7 @@ class Categoria extends Model
     {
         return $this->hasMany(Produto::class, 'CATEGORIA_ID')
                     ->where('PRODUTO_ATIVO', TRUE)
+                    ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)
                     ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0);
     }
 }

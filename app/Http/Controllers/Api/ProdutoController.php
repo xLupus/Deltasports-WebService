@@ -138,9 +138,25 @@ class ProdutoController extends Controller
      */
     public function search(Request $request)
     {
-        $query = $request->name;
-        $produto = Produto::ativos()->where('PRODUTO_NOME', 'like', '%' . $query . '%')->get();
-        return response()->json(['data' => $produto], 200);
-        // return view('produto.search', ['produto' => $produto]);
+        $query = $request->name; 
+        
+        try {
+            $product = Produto::ativos()->where('PRODUTO_NOME', 'like', '%' . $query . '%')->get();
+
+            return response()->json([
+                'status'  => 200,
+                'message' => "A pesquisa por $query resultou em:",
+                'data'    => ProdutoResource::collection($product)
+            ], 200);
+
+        } catch (\Exception $err) {
+            //TODO - Fazer a verificacao de erro
+            $classError = get_class($err);
+
+            return response()->json([
+                "status"  => 500,
+                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
+            ]);
+        }
     }
 }

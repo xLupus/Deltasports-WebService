@@ -35,26 +35,31 @@ class ProdutoController extends Controller
 
                     $statusMessage = 200;
                 }
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Paramêtro de filtro invalido'
+                ], 400);
             }
+        } else {
+            $statusMessage = 200;
         }
 
-        $orderQuery = $request->input('order', null);
+        if ($statusMessage == 200) {
+            $orderQuery = $request->input('order', null);
 
-        if ($orderQuery) {
-            $orderAcceptColumns = ['nome', 'preco'];
+            if ($orderQuery) {
+                $orderAcceptColumns = ['nome', 'preco'];
+                $sorts = explode(',', $orderQuery);
 
-            $sorts = explode(',', $orderQuery);
+                foreach ($sorts as $sortColumn) {
+                    $sortDirection = $orderQuery[0] == '-' ? 'DESC' : 'ASC';
+                    $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do comeco da string 
 
-            foreach ($sorts as $sortColumn) {
-                $sortDirection = $orderQuery[0] == '-' ? 'DESC' : 'ASC';
-
-                $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do comeco da string 
-
-                if (in_array($sortColumn, $orderAcceptColumns)) {
-
-                    $sortColumn == 'nome' && $query->orderBy('PRODUTO_NOME', $sortDirection);
-
-                    $sortColumn == 'preco' && $query->orderBy('PRODUTO_PRECO', $sortDirection);
+                    if (in_array($sortColumn, $orderAcceptColumns)) {
+                        $sortColumn == 'nome' && $query->orderBy('PRODUTO_NOME', $sortDirection);
+                        $sortColumn == 'preco' && $query->orderBy('PRODUTO_PRECO', $sortDirection);
+                    }
                 }
             }
         }
@@ -79,16 +84,17 @@ class ProdutoController extends Controller
 
             return response()->json([
                 "status"  => $statusMessage,
-                "message" => "Todos os produtos",
+                "message" => $message,
                 "meta"    => $meta,
                 "data"    => ProdutoResource::collection($products)
             ]);
         } catch (\Exception $err) {
+            //TODO - Fazer a verificacao de erro
             $classError = get_class($err);
 
             return response()->json([
-                "status"    => 500,
-                "message"   => "Ops! Ocorreu um erro, por favor tente novamente."
+                "status"  => 500,
+                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
             ]);
         }
     }
@@ -96,19 +102,34 @@ class ProdutoController extends Controller
 
     /**
      * Display the specified resource.
-     * TODO - Fazer validações e tratamento de erros
+     * TODO - Analisar a validacao dps, to com sono
      */
     public function show(Request $request)
     {
-        $productId = $request->id;
+        if (!ctype_digit($request->id)) {
+            return response()->json([
+                'status'  => 400,
+                'message' => 'O parametro precisar ser numerico'
+            ], 400);
+        }
 
-        $product = Produto::ativos()->where('PRODUTO_ID', $productId)->get();
+        try {
+            $product = Produto::ativos()->where('PRODUTO_ID', $request->id)->get();
 
-        return response()->json([
-            "status"    => 200,
-            "message"   => null,
-            "data"   => ProdutoResource::collection($product) //Enter pq new n foi
-        ]);
+            return response()->json([
+                "status"    => 200,
+                "message"   => null,
+                "data"      => ProdutoResource::collection($product)
+            ]);
+        } catch (\Exception $err) {
+            //TODO - Fazer a verificacao de erro
+            $classError = get_class($err);
+
+            return response()->json([
+                "status"  => 500,
+                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
+            ]);
+        }
     }
 
     /**

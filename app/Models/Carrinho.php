@@ -27,4 +27,8 @@ class Carrinho extends Model
         return $query;
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Produto::class, 'PRODUTO_ID')->where('PRODUTO_ATIVO', TRUE);
+    }
 }

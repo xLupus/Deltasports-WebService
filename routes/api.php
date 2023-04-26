@@ -24,13 +24,15 @@ Route::controller(AuthController::class)->group(function () {
         Route::get('/categories', 'index');
         Route::get('/category/{id}/products', 'showProducts');
     });
+
+    Route::controller(CarrinhoController::class)->group(function () {
+        Route::post('/user/cart', 'store');
+        Route::get('/user/cart', 'show');
+    });
 });
 
-Route::controller(CarrinhoController::class)->group(function() {
-    Route::post('/user/{id}/cart', 'store');
-    /* 
-    Route::get('/user/{id}/cart', 'show');
-    Route::patch('/user/{id}/cart', 'update');
-    Route::delete('/user/{id}/cart/{id}', 'deleteOne');
-     */
-});
+        /* 
+
+        Route::patch('/user/{id}/cart', 'update');
+        Route::delete('/user/{id}/cart/{id}', 'deleteOne');
+         */

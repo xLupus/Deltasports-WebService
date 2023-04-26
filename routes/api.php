@@ -25,9 +25,9 @@ Route::controller(CategoriaController::class)->group(function () {
 });
 
 Route::controller(CarrinhoController::class)->group(function() {
+    Route::post('/user/{id}/cart', 'store');
     /* 
     Route::get('/user/{id}/cart', 'show');
-    Route::post('/user/{id}/cart', 'store');
     Route::patch('/user/{id}/cart', 'update');
     Route::delete('/user/{id}/cart/{id}', 'deleteOne');
      */

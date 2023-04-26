@@ -129,7 +129,7 @@ class ProdutoController extends Controller
                 "status"  => 500,
                 "message" => "Ops! Ocorreu um erro, por favor tente novamente."
             ]);
-        }
+        } 
     }
 
     /**

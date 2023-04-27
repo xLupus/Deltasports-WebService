@@ -54,7 +54,7 @@ class ProdutoController extends Controller
 
                 foreach ($sorts as $sortColumn) {
                     $sortDirection = $orderQuery[0] == '-' ? 'DESC' : 'ASC';
-                    $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do comeco da string 
+                    $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do comeco da string
 
                     if (in_array($sortColumn, $orderAcceptColumns)) {
                         $sortColumn == 'nome' && $query->orderBy('PRODUTO_NOME', $sortDirection);
@@ -129,17 +129,17 @@ class ProdutoController extends Controller
                 "status"  => 500,
                 "message" => "Ops! Ocorreu um erro, por favor tente novamente."
             ]);
-        } 
+        }
     }
 
     /**
-     * 
+     *
      * TODO - Fazer validações e tratamento de erros
      */
     public function search(Request $request)
     {
-        $query = $request->name; 
-        
+        $query = $request->name;
+
         try {
             $product = Produto::ativos()->where('PRODUTO_NOME', 'like', '%' . $query . '%')->get();
 

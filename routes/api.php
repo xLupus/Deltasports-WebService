@@ -13,7 +13,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('auth/logout', 'logout');
 
     Route::post('auth/refresh', 'refresh');
-    Route::get('auth/user', 'user');
 
     Route::controller(ProdutoController::class)->group(function () {
         Route::get('/products', 'index');
@@ -30,7 +29,7 @@ Route::controller(AuthController::class)->group(function () {
         Route::get('/user', 'show');
         Route::patch('/user', 'update');
     });
-    
+
     Route::controller(CarrinhoController::class)->group(function () {
         Route::post('/user/cart', 'store');
         Route::get('/user/cart', 'show');

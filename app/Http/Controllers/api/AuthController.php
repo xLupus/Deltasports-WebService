@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\RegisterRequest;
-use App\Http\Resources\Api\AuthResource;
+use App\Http\Resources\Api\UserResource;
 
 class AuthController extends Controller
 {
@@ -28,7 +29,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'Usuário cadastrado com sucesso!',
-                'data' => new AuthResource($user),
+                'data' => new UserResource($user),
             ], 200);
         } catch (\Throwable $err) {
             return $this->exceptions($err);
@@ -43,7 +44,7 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => 200,
                     'message' => 'Usuário logado com sucesso!',
-                    'data' => new AuthResource(auth()->user()),
+                    'data' => new UserResource(auth()->user()),
                     'authorization' => [
                         'token' => $token,
                         'type' => 'bearer',
@@ -79,19 +80,11 @@ class AuthController extends Controller
         return response()->json([
             'status'    => 200,
             'message'   => 'Token revalidado com sucesso!',
-            'data'      => new AuthResource(auth()->user()),
+            'data'      => new UserResource(auth()->user()),
             'authorization' => [
                 'token'     => auth()->refresh(),
                 'type'      => 'bearer',
             ]
-        ], 200);
-    }
-
-    public function user() {
-        return response()->json([
-            'status'    => 200,
-            'message'   => 'Usuário retornado com sucesso!',
-            'data'      => new AuthResource(auth()->user())
         ], 200);
     }
 

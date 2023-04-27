@@ -24,7 +24,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'                  => 'required|string|max:50|not_regex:/[^A-Za-z]/',
+            'name'                  => 'required|string|max:50|not_regex:/[^A-Za-z ]/',
             'email'                 => 'required|string|email:rfc,dns|unique:USUARIO,USUARIO_EMAIL',
             'password'              => 'required|string|confirmed|min:8',
             'password_confirmation' => 'required|string|min:8',

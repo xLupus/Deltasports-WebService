@@ -55,10 +55,10 @@ class RegisterRequest extends FormRequest
         throw new ValidationException(
             $validator,
             response()->json([
-                'status' => 500,
+                'status' => 422,
                 'message' => $validator->errors(),
                 'data' => null
-            ], 500)
+            ], 422)
         );
     }
 }

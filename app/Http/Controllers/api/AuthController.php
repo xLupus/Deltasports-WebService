@@ -89,7 +89,7 @@ class AuthController extends Controller
     }
 
     //Exceptions
-    public static function exceptions($err) {
+    public function exceptions($err) {
         switch (get_class($err)) {
             case \Illuminate\Database\Eloquent\ModelNotFoundException::class:
                 return response()->json([

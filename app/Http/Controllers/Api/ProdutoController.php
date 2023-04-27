@@ -6,69 +6,65 @@ use App\Http\Resources\Api\ProdutoResource;
 use Illuminate\Http\Request;
 use App\Models\Produto;
 use App\Http\Controllers\Controller;
+use Exception;
 
 class ProdutoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * TODO - Aplicar as regras de negocio
-     * TODO - Remover codigo desnecessario
-     */
     public function index(Request $request)
     {
-        $query = Produto::ativos();
+        try {
+            $query = Produto::ativos();
 
-        $statusMessage = 0;
-        $message = 'Todos os Produtos';
-        $products = [];
+            $statusMessage = 0;
+            $message = 'Produtos retornados com sucesso!';
+            $products = [];
 
-        $filterQuery = $request->input('filter', null);
+            $filterQuery = $request->input('filter', null);
 
-        if ($filterQuery) {
-            $filterAcceptColumns = ['categoria'];
+            if ($filterQuery) {
+                $filterAcceptColumns = ['categoria'];
 
-            [$filterColumn, $filterParam] = explode(':', $filterQuery);
+                [$filterColumn, $filterParam] = explode(':', $filterQuery);
 
-            if (in_array($filterColumn, $filterAcceptColumns)) {
-                if ($filterColumn == 'categoria') {
-                    $query->whereRelation('categoria', 'CATEGORIA_NOME', '=', $filterParam);
+                if (in_array($filterColumn, $filterAcceptColumns)) {
+                    if ($filterColumn == 'categoria') {
+                        $query->whereRelation('categoria', 'CATEGORIA_NOME', '=', $filterParam);
 
-                    $statusMessage = 200;
+                        $statusMessage = 200;
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Paramêtro de filtro invalido'
+                    ], 400);
                 }
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Paramêtro de filtro invalido'
-                ], 400);
+                $statusMessage = 200;
             }
-        } else {
-            $statusMessage = 200;
-        }
 
-        if ($statusMessage == 200) {
-            $orderQuery = $request->input('order', null);
+            if ($statusMessage == 200) {
+                $orderQuery = $request->input('order', null);
 
-            if ($orderQuery) {
-                $orderAcceptColumns = ['nome', 'preco'];
-                $sorts = explode(',', $orderQuery);
+                if ($orderQuery) {
+                    $orderAcceptColumns = ['nome', 'preco'];
+                    $sorts = explode(',', $orderQuery);
 
-                foreach ($sorts as $sortColumn) {
-                    $sortDirection = $orderQuery[0] == '-' ? 'DESC' : 'ASC';
-                    $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do comeco da string
+                    foreach ($sorts as $sortColumn) {
+                        $sortDirection = $orderQuery[0] == '-' ? 'DESC' : 'ASC';
+                        $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do começo da string
 
-                    if (in_array($sortColumn, $orderAcceptColumns)) {
-                        $sortColumn == 'nome' && $query->orderBy('PRODUTO_NOME', $sortDirection);
-                        $sortColumn == 'preco' && $query->orderBy('PRODUTO_PRECO', $sortDirection);
+                        if (in_array($sortColumn, $orderAcceptColumns)) {
+                            $sortColumn == 'nome' && $query->orderBy('PRODUTO_NOME', $sortDirection);
+                            $sortColumn == 'preco' && $query->orderBy('PRODUTO_PRECO', $sortDirection);
+                        }
                     }
                 }
             }
-        }
 
-        $page = ctype_digit($request->input('page')) ? $request->input('page') : 1;
+            $page = ctype_digit($request->input('page')) ? $request->input('page') : 1;
 
-        $productsPerPage = 10;
+            $productsPerPage = 10;
 
-        try {
             $query->offset(($page - 1) * $productsPerPage)->limit($productsPerPage);
             $products = $query->get();
 
@@ -83,64 +79,37 @@ class ProdutoController extends Controller
             ];
 
             return response()->json([
-                "status"  => $statusMessage,
-                "message" => $message,
-                "meta"    => $meta,
-                "data"    => ProdutoResource::collection($products)
+                'status'  => $statusMessage,
+                'message' => $message,
+                'meta'    => $meta,
+                'data'    => ProdutoResource::collection($products)
             ]);
-        } catch (\Exception $err) {
-            //TODO - Fazer a verificacao de erro
-            $classError = get_class($err);
-
-            return response()->json([
-                "status"  => 500,
-                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
-            ]);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
         }
     }
 
-
-    /**
-     * Display the specified resource.
-     * TODO - Analisar a validacao dps, to com sono
-     */
     public function show(Request $request)
     {
-        if (!ctype_digit($request->id)) {
-            return response()->json([
-                'status'  => 400,
-                'message' => 'O parametro precisar ser numerico'
-            ], 400);
-        }
-
         try {
+            if (!ctype_digit($request->id)) throw new Exception('O paramêtro informado precisa ser numérico');
+
             $product = Produto::ativos()->where('PRODUTO_ID', $request->id)->get();
 
             return response()->json([
-                "status"    => 200,
-                "message"   => null,
-                "data"      => ProdutoResource::collection($product)
+                'status'    => 200,
+                'message'   => 'Produto retornado com sucesso!',
+                'data'      => ProdutoResource::collection($product)
             ]);
-        } catch (\Exception $err) {
-            //TODO - Fazer a verificacao de erro
-            $classError = get_class($err);
-
-            return response()->json([
-                "status"  => 500,
-                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
-            ]);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
         }
     }
 
-    /**
-     *
-     * TODO - Fazer validações e tratamento de erros
-     */
     public function search(Request $request)
     {
-        $query = $request->name;
-
         try {
+            $query = $request->name;
             $product = Produto::ativos()->where('PRODUTO_NOME', 'like', '%' . $query . '%')->get();
 
             return response()->json([
@@ -148,15 +117,45 @@ class ProdutoController extends Controller
                 'message' => "A pesquisa por $query resultou em:",
                 'data'    => ProdutoResource::collection($product)
             ], 200);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
+        }
+    }
 
-        } catch (\Exception $err) {
-            //TODO - Fazer a verificacao de erro
-            $classError = get_class($err);
+    //Exceptions
+    public function exceptions($err) {
+        switch (get_class($err)) {
+            case \Illuminate\Database\Eloquent\ModelNotFoundException::class:
+                return response()->json([
+                    'status' => 404,
+                    'message' => $err->getMessage(),
+                    'data' => null
+                ], 404);
+                break;
 
-            return response()->json([
-                "status"  => 500,
-                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
-            ]);
+            case \Illuminate\Database\QueryException::class:
+                return response()->json([
+                    'status' => 500,
+                    'message' => $err->getMessage(),
+                    'data' => null
+                ], 500);
+                break;
+
+            case \Exception::class:
+                return response()->json([
+                    'status' => 500,
+                    'message' => $err->getMessage(),
+                    'data' => null
+                ], 500);
+                break;
+
+            default:
+                return response()->json([
+                    'status' => 500,
+                    'mensage' => 'Erro interno',
+                    'data' => null
+                ], 500);
+                break;
         }
     }
 }

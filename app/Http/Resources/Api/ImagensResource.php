@@ -18,7 +18,7 @@ class ImagensResource extends JsonResource
             'id' => $this->IMAGEM_ID ?? null,
             'order' => $this->IMAGEM_ORDEM ?? null,
             'url' => $this->IMAGEM_URL ?? null,
-            'product' => $this->PRODUTO_ID ?? null
+            'product_id' => $this->PRODUTO_ID ?? null
         ];
     }
 }

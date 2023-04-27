@@ -15,17 +15,19 @@ class Categoria extends Model
 
     public $timestamps = false;
 
+    
+    public static function ativos()
+    {
+        return Categoria::where('CATEGORIA_ATIVO', TRUE)
+                                ->whereRelation('produtos', 'PRODUTO_ATIVO', TRUE);
+    }
+
+
     public function produtos()
     {
         return $this->hasMany(Produto::class, 'CATEGORIA_ID')
                     ->where('PRODUTO_ATIVO', TRUE)
                     ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)
                     ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0);
-    }
-    
-    public static function ativos()
-    {
-        return Categoria::where('CATEGORIA_ATIVO', TRUE)
-                                ->whereRelation('produtos', 'PRODUTO_ATIVO', TRUE);
     }
 }

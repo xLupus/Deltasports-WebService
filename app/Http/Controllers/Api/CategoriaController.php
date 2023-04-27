@@ -17,9 +17,9 @@ class CategoriaController extends Controller
         $categories = Categoria::ativos()->get();
 
         return response()->json([
-            "status"     => 200,
-            "message"    => null,
-            "categories" => $categories
+            'status'     => 200,
+            'message'    => null,
+            'data' => $categories
         ]);
     }
 
@@ -29,7 +29,13 @@ class CategoriaController extends Controller
     public function showProducts(Request $request)
     {
         $categoriaId = $request->id;
+
         $produtos = Produto::ativos()->where('CATEGORIA_ID', $categoriaId)->get();
-        return response()->json(["produtos" => $produtos]);
+
+        return response()->json([
+            'status'  => 200,
+            'message' => "Produtos da categoria [...]",
+            'data'    => $produtos
+        ]);
     }
 }

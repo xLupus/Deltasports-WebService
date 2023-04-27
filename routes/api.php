@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CarrinhoController;
 use App\Http\Controllers\Api\ProdutoController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\PerfilController;
@@ -27,5 +28,11 @@ Route::controller(AuthController::class)->group(function () {
 
     Route::controller(PerfilController::class)->group(function () {
         Route::get('/user', 'show');
+        Route::patch('/user', 'update');
+    });
+    
+    Route::controller(CarrinhoController::class)->group(function () {
+        Route::post('/user/cart', 'store');
+        Route::get('/user/cart', 'show');
     });
 });

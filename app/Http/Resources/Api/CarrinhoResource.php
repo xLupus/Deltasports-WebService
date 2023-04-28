@@ -14,6 +14,15 @@ class CarrinhoResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'product' => [
+                'id' => $this->PRODUTO_ID,
+                'qtd' => $this->ITEM_QTD,
+                'name' => $this->PRODUTO_NOME,
+                'description' => $this->PRODUTO_DESC,
+                'price' => $this->PRODUTO_PRECO,
+                'discount' => $this->PRODUTO_DESCONTO,
+            ],
+        ];
     }
 }

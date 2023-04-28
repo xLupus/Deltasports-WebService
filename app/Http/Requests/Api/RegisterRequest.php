@@ -44,7 +44,7 @@ class RegisterRequest extends FormRequest
             'not_regex'             => 'O campo informado não aceita números e/ ou símbolos.',
             'min'                   => 'O campo informado deve ter no mínimo 8 digitos.',
             'confirmed'             => 'As senhas informadas não correspondem.',
-            'email'                 => 'O formato de E-mail  é inválido.',
+            'email'                 => 'O formato de E-mail é inválido.',
             'email.unique'          => 'O E-mail informado já existe.',
             'cpf.unique'            => 'O CPF informado já existe.',
             'cpf.digits_between'    => 'O campo informado deve ter 11 digitos.'

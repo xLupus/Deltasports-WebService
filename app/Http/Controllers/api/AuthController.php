@@ -8,12 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Resources\Api\UserResource;
+use App\Traits\Exception as Errors;
 
 class AuthController extends Controller
 {
-    public function __construct() {
-        $this->middleware('auth:api')->except('register', 'login');
-    }
+    use Errors;
 
     public function register(RegisterRequest $request) {
         try {
@@ -53,7 +52,7 @@ class AuthController extends Controller
             } else {
                 return response()->json([
                     'status'    => 401,
-                    'message'   => 'O Email ou senha estão incorretos.',
+                    'message'   => 'Email ou senha estão incorretos.',
                     'data'      => $request->only('email', 'password') //mostra os dados
                 ], 401);
             }
@@ -86,34 +85,5 @@ class AuthController extends Controller
                 'type'      => 'bearer',
             ]
         ], 200);
-    }
-
-    //Exceptions
-    public function exceptions($err) {
-        switch (get_class($err)) {
-            case \Illuminate\Database\Eloquent\ModelNotFoundException::class:
-                return response()->json([
-                    'status' => 404,
-                    'message' => $err->getMessage(),
-                    'data' => null
-                ], 404);
-                break;
-
-            case \Illuminate\Database\QueryException::class:
-                return response()->json([
-                    'status' => 500,
-                    'message' => $err->getMessage(),
-                    'data' => null
-                ], 500);
-                break;
-
-            default:
-                return response()->json([
-                    'status' => 500,
-                    'mensage' => 'Erro interno',
-                    'data' => null
-                ], 500);
-                break;
-        }
     }
 }

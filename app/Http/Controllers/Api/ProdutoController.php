@@ -6,10 +6,13 @@ use App\Http\Resources\Api\ProdutoResource;
 use Illuminate\Http\Request;
 use App\Models\Produto;
 use App\Http\Controllers\Controller;
+use App\Traits\Exception as Errors;
 use Exception;
 
 class ProdutoController extends Controller
 {
+    use Errors;
+
     public function index(Request $request)
     {
         try {
@@ -35,7 +38,8 @@ class ProdutoController extends Controller
                 } else {
                     return response()->json([
                         'status' => 400,
-                        'message' => 'Paramêtro de filtro invalido'
+                        'message' => 'Paramêtro de filtro invalido',
+                        'data' => null
                     ], 400);
                 }
             } else {
@@ -119,43 +123,6 @@ class ProdutoController extends Controller
             ], 200);
         } catch (\Throwable $err) {
             return $this->exceptions($err);
-        }
-    }
-
-    //Exceptions
-    public function exceptions($err) {
-        switch (get_class($err)) {
-            case \Illuminate\Database\Eloquent\ModelNotFoundException::class:
-                return response()->json([
-                    'status' => 404,
-                    'message' => $err->getMessage(),
-                    'data' => null
-                ], 404);
-                break;
-
-            case \Illuminate\Database\QueryException::class:
-                return response()->json([
-                    'status' => 500,
-                    'message' => $err->getMessage(),
-                    'data' => null
-                ], 500);
-                break;
-
-            case \Exception::class:
-                return response()->json([
-                    'status' => 500,
-                    'message' => $err->getMessage(),
-                    'data' => null
-                ], 500);
-                break;
-
-            default:
-                return response()->json([
-                    'status' => 500,
-                    'mensage' => 'Erro interno',
-                    'data' => null
-                ], 500);
-                break;
         }
     }
 }

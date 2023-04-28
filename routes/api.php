@@ -10,28 +10,30 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(function () {
     Route::post('auth/register', 'register');
     Route::post('auth/login', 'login');
-    Route::get('auth/logout', 'logout');
 
-    Route::post('auth/refresh', 'refresh');
+    Route::middleware('auth:api')->group(function () {
+        Route::get('auth/logout', 'logout');
+        Route::post('auth/refresh', 'refresh');
 
-    Route::controller(ProdutoController::class)->group(function () {
-        Route::get('/products', 'index');
-        Route::get('/product/{id}', 'show');
-        Route::get('/product/search/{name}', 'search');
-    });
+        Route::controller(ProdutoController::class)->group(function () {
+            Route::get('/products', 'index');
+            Route::get('/product/{id}', 'show');
+            Route::get('/product/search/{name}', 'search');
+        });
 
-    Route::controller(CategoriaController::class)->group(function () {
-        Route::get('/categories', 'index');
-        Route::get('/category/{id}/products', 'showProducts');
-    });
+        Route::controller(CategoriaController::class)->group(function () {
+            Route::get('/categories', 'index');
+            Route::get('/category/{id}/products', 'showProducts');
+        });
 
-    Route::controller(PerfilController::class)->group(function () {
-        Route::get('/user', 'show');
-        Route::patch('/user', 'update');
-    });
+        Route::controller(PerfilController::class)->group(function () {
+            Route::get('/user', 'show');
+            Route::patch('/user', 'update');
+        });
 
-    Route::controller(CarrinhoController::class)->group(function () {
-        Route::post('/user/cart', 'store');
-        Route::get('/user/cart', 'show');
+        Route::controller(CarrinhoController::class)->group(function () {
+            Route::post('/user/cart', 'store');
+            Route::get('/user/cart', 'show');
+        });
     });
 });

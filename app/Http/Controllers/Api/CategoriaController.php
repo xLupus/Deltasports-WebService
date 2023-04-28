@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Categoria;
 use App\Models\Produto;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\CategoriaResource;
+use App\Http\Resources\Api\ProdutoResource;
 
 class CategoriaController extends Controller
 {
@@ -17,9 +19,9 @@ class CategoriaController extends Controller
         $categories = Categoria::ativos()->get();
 
         return response()->json([
-            'status'     => 200,
-            'message'    => null,
-            'data' => $categories
+            'status'        => 200,
+            'message'       => 'Categorias retornadas com sucesso!',
+            'data'          => CategoriaResource::collection($categories)
         ]);
     }
 
@@ -34,8 +36,8 @@ class CategoriaController extends Controller
 
         return response()->json([
             'status'  => 200,
-            'message' => "Produtos da categoria [...]",
-            'data'    => $produtos
+            'message' => 'Produtos da categoria retornados com sucesso!',
+            'data'    => ProdutoResource::collection($produtos)
         ]);
     }
 }

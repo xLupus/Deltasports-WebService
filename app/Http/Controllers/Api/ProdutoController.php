@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Produto;
 use App\Http\Controllers\Controller;
 use App\Traits\Exception as Errors;
-use Exception;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ProdutoController extends Controller
 {
@@ -96,9 +97,15 @@ class ProdutoController extends Controller
     public function show(Request $request)
     {
         try {
-            if (!ctype_digit($request->id)) throw new Exception('O paramêtro informado precisa ser numérico');
-
             $product = Produto::ativos()->where('PRODUTO_ID', $request->id)->get();
+
+            if(count($product) === 0) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => 'Produto não encontrado.',
+                    'data'      => null
+                ], 404);
+            }
 
             return response()->json([
                 'status'    => 200,
@@ -114,7 +121,15 @@ class ProdutoController extends Controller
     {
         try {
             $query = $request->name;
-            $product = Produto::ativos()->where('PRODUTO_NOME', 'like', '%' . $query . '%')->get();
+            $product = Produto::ativos()->where('PRODUTO_NOME', 'LIKE', '%' . $query . '%')->get();
+
+            if(count($product) === 0) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => "A pesquisa por $query não encontrou resultados correspondentes.",
+                    'data'      => null
+                ], 404);
+            }
 
             return response()->json([
                 'status'  => 200,

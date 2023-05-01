@@ -21,13 +21,14 @@ trait Exception {
                 ], 500);
                 break;
 
-            case \Exception::class:
+            case \Illuminate\Validation\ValidationException::class:
                 return response()->json([
-                    'status'    => 500,
+                    'status'    => 406,
                     'message'   => $err->getMessage(),
                     'data'      => null
-                ], 500);
+                ], 406);
                 break;
+
 
             default:
                 return response()->json([

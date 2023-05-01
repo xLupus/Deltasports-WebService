@@ -53,9 +53,9 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $err)
     {
         return response()->json([
-            'status' => 401,
-            'message' => 'Acesso negado, o token informado está incorreto ou não existe',
-            'data' => null
+            'status'    => 401,
+            'message'   => 'Acesso negado, o token informado está incorreto ou não existe.',
+            'data'      => null
         ], 401);
     }
 }

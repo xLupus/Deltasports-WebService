@@ -36,10 +36,10 @@ class CarrinhoRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'required'  => 'Preencha este campo',
-            'numeric'   => 'O campo informado deve ser numérico',
-            'gt'        => 'O campo de produto precisa ter um valor maior que 0',
-            'gte'       => 'O campo de quantidade precisa ter um valor maior ou igual a 0'
+            'required'  => 'Preencha este campo.',
+            'numeric'   => 'O campo informado deve ser numérico.',
+            'gt'        => 'O campo de produto precisa ter um valor maior que 0.',
+            'gte'       => 'O campo de quantidade precisa ter um valor maior ou igual a 0.'
         ];
     }
 

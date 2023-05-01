@@ -23,21 +23,21 @@ class CarrinhoController extends Controller
 
             if (count($cart) > 0) {
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'Carrinho retornado com sucesso!',
-                    'data' => [
-                        'user' => [
-                            'id' => $userId
+                    'status'    => 200,
+                    'message'   => 'Carrinho retornado com sucesso!',
+                    'data'      => [
+                        'user'  => [
+                            'id'    => $userId
                         ],
-                        'cart' => CarrinhoResource::collection($cart)
+                        'cart'      => CarrinhoResource::collection($cart)
                     ]
-                ]);
+                ], 200);
             } else {
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'O carrinho informado não existe',
-                    'data'   => null
-                ]);
+                    'status'    => 200,
+                    'message'   => 'O carrinho informado não existe',
+                    'data'      => null
+                ], 200);
             }
         } catch (\Throwable $err) {
             return $this->exceptions($err);
@@ -55,6 +55,43 @@ class CarrinhoController extends Controller
                 'PRODUTO_ID' => $productId
             ])->first();
 
+            if($cart) {
+                return response()->json([
+                    'status'    => 200,
+                    'message'   => 'Não foi possível criar um carrinho, pois o mesmo já existe.',
+                    'data'      => null
+                ], 200);
+            }
+
+            $cart = new Carrinho();
+
+            $cart->USUARIO_ID   = auth()->user()->USUARIO_ID;
+            $cart->PRODUTO_ID   = $productId;
+            $cart->ITEM_QTD     = $qtd;
+
+            $cart->save();
+
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Produto inserido no carrinho com sucesso!',
+                'data'      => new CarrinhoResource($cart)
+            ], 200);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
+        }
+    }
+
+    public function update(CarrinhoRequest $request)
+    {
+        try {
+            $productId = round($request['product']);
+            $qtd       = round($request['qtd']);
+
+            $cart = Carrinho::where([
+                'USUARIO_ID' => auth()->user()->USUARIO_ID,
+                'PRODUTO_ID' => $productId
+            ])->first();
+
             if ($cart) { //se tiver carrinho
                 $estoque = Produto::ativos()->where('PRODUTO_ID', $productId)->first()->estoque->PRODUTO_QTD;
 
@@ -64,23 +101,15 @@ class CarrinhoController extends Controller
                     $cart->update(['ITEM_QTD' => 0]);
 
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'Produtos atualizados no carrinho com sucesso!',
-                    'data' => new CarrinhoResource($cart)
+                    'status'    => 200,
+                    'message'   => 'Produto atualizado no carrinho com sucesso!',
+                    'data'      => new CarrinhoResource($cart)
                 ], 200);
             } else {
-                $cart = new Carrinho();
-
-                $cart->USUARIO_ID   = auth()->user()->USUARIO_ID;
-                $cart->PRODUTO_ID   = $productId;
-                $cart->ITEM_QTD     = $request->qtd;
-
-                $cart->save();
-
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'Produtos inseridos no carrinho com sucesso!',
-                    'data' => null
+                    'status'    => 200,
+                    'message'   => 'O produto informado não existe no carrinho',
+                    'data'      => null
                 ], 200);
             }
         } catch (\Throwable $err) {

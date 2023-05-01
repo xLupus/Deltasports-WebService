@@ -21,7 +21,9 @@ class CategoriaController extends Controller
         return response()->json([
             'status'        => 200,
             'message'       => 'Categorias retornadas com sucesso!',
-            'data'          => CategoriaResource::collection($categories)
+            'data'          => [
+                'categories' => CategoriaResource::collection($categories)
+            ]
         ]);
     }
 

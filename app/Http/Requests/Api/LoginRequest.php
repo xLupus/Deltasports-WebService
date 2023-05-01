@@ -5,9 +5,11 @@ namespace App\Http\Requests\Api;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
+use App\Traits\Exception as Errors;
 
 class LoginRequest extends FormRequest
 {
+    use Errors;
     /**
      * Determine if the user is authorized to make this request.
      */

@@ -13,11 +13,15 @@ class PerfilController extends Controller
     use Errors;
 
     public function show() {
-        return response()->json([
-            'status'    => 200,
-            'message'   => 'Usuário retornado com sucesso!',
-            'data'      => new UserResource(auth()->user())
-        ], 200);
+        try {
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Usuário retornado com sucesso!',
+                'data'      => new UserResource(auth()->user())
+            ], 200);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
+        }
     }
 
     public function update(PerfilRequest $request) {
@@ -30,9 +34,9 @@ class PerfilController extends Controller
             $user->update();
 
             return response()->json([
-                'status' => 200,
-                'message' => 'Usuário atualizado com sucesso!',
-                'data' => null
+                'status'    => 200,
+                'message'   => 'Usuário atualizado com sucesso!',
+                'data'      => null
             ], 200);
         } catch (\Throwable $err) {
             return $this->exceptions($err);

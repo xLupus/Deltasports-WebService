@@ -78,7 +78,7 @@ class ProdutoController extends Controller
             $meta = [
                 'total_pages'    => $numberOfPages,
                 'total_items'    => $totalOfProducts,
-                'current_page'   => $page,
+                'current_page'   => intval($page),
                 'items_per_page' => $productsPerPage
             ];
 

@@ -26,9 +26,9 @@ class AuthController extends Controller
             $user->save();
 
             return response()->json([
-                'status' => 200,
-                'message' => 'Usuário cadastrado com sucesso!',
-                'data' => new UserResource($user),
+                'status'    => 200,
+                'message'   => 'Usuário cadastrado com sucesso!',
+                'data'      => new UserResource($user),
             ], 200);
         } catch (\Throwable $err) {
             return $this->exceptions($err);
@@ -41,12 +41,12 @@ class AuthController extends Controller
 
             if($token = auth()->attempt($credentials)) {
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'Usuário logado com sucesso!',
-                    'data' => new UserResource(auth()->user()),
+                    'status'    => 200,
+                    'message'   => 'Usuário logado com sucesso!',
+                    'data'      => new UserResource(auth()->user()),
                     'authorization' => [
-                        'token' => $token,
-                        'type' => 'bearer',
+                        'token'     => $token,
+                        'type'      => 'bearer',
                     ]
                 ], 200);
             } else {

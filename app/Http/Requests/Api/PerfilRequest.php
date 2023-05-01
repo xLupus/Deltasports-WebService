@@ -24,7 +24,7 @@ class PerfilRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email'     => 'required|string|email:rfc,dns',
+            'email'     => 'required|string|email:rfc,dns|unique:USUARIO,USUARIO_EMAIL',
             'password'  => 'required|string|min:8'
         ];
     }
@@ -38,6 +38,7 @@ class PerfilRequest extends FormRequest
         return [
             'required'  => 'Preencha este campo.',
             'email'     => 'Formato de E-mail inválido.',
+            'unique'    => 'O E-mail informado já existe.',
             'min'       => 'O campo informado deve ter no mínimo 8 digitos.'
         ];
     }

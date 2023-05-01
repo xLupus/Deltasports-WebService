@@ -32,8 +32,9 @@ Route::controller(AuthController::class)->group(function () {
         });
 
         Route::controller(CarrinhoController::class)->group(function () {
-            Route::post('/user/cart', 'store');
             Route::get('/user/cart', 'show');
+            Route::post('/user/cart', 'store');
+            Route::patch('/user/cart', 'update');
         });
     });
 });

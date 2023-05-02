@@ -47,27 +47,31 @@ class CarrinhoController extends Controller
     public function store(CarrinhoRequest $request)
     {
         try {
-            $productId = $request['product'];
-            $qtd       = $request['qtd'];
+            $productId = round($request['product']);
+            $qtd       = round($request['qtd']);
 
             $cart = Carrinho::where([
                 'USUARIO_ID' => auth()->user()->USUARIO_ID,
                 'PRODUTO_ID' => $productId
-            ])->first();
+            ])->first(); //encontra um produto no carrinho.
 
-            if($cart) {
+            $product = Produto::ativos()->where('PRODUTO_ID', $productId)->get();
+
+            if($cart || count($product) === 0) {
                 return response()->json([
-                    'status'    => 200,
-                    'message'   => 'Não foi possível criar um carrinho, pois o mesmo já existe.',
+                    'status'    => 500,
+                    'message'   => 'Não foi possível inserir o produto no carrinho.',
                     'data'      => null
-                ], 200);
+                ], 500);
             }
+
+            $estoque = Produto::ativos()->where('PRODUTO_ID', $productId)->first()->estoque->PRODUTO_QTD;
 
             $cart = new Carrinho();
 
             $cart->USUARIO_ID   = auth()->user()->USUARIO_ID;
             $cart->PRODUTO_ID   = $productId;
-            $cart->ITEM_QTD     = $qtd;
+            $cart->ITEM_QTD     = $qtd > $estoque ? $estoque : $qtd;
 
             $cart->save();
 

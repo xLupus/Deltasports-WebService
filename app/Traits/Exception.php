@@ -29,7 +29,6 @@ trait Exception {
                 ], 406);
                 break;
 
-
             default:
                 return response()->json([
                     'status'    => 500,

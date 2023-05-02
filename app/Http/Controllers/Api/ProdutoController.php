@@ -102,7 +102,7 @@ class ProdutoController extends Controller
             if(count($product) === 0) {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Produto não encontrado.',
+                    'message'   => 'Não foi possível encontrar o produto informado.',
                     'data'      => null
                 ], 404);
             }

@@ -42,17 +42,16 @@ class CategoriaController extends Controller
     public function showProducts(Request $request)
     {
         try {
-            $validator = Validator::make(['id' => $request['id']], ['id' => 'required|integer|numeric']);
-
-            if($validator->fails()) {
-                throw ValidationException::withMessages([
-                    'id' => 'O paramêtro informado deve ser numérico'
-                ]);
-            }
-
             $categoriaId = $request->id;
-
             $produtos = Produto::ativos()->where('CATEGORIA_ID', $categoriaId)->get();
+
+            if(count($produtos) === 0) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => 'Não foi possível encontrar a categoria informada.',
+                    'data'      => null
+                ], 404);
+            }
 
             return response()->json([
                 'status'  => 200,

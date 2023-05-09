@@ -3,109 +3,121 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\CarrinhoRequest;
+use App\Http\Resources\Api\CarrinhoResource;
 use App\Models\Carrinho;
 use App\Models\Produto;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use App\Traits\Exception as Errors;
 
 class CarrinhoController extends Controller
 {
-    /**
-     * Display the specified resource.
-     * TODO - Pegar o id do usuario pela sessao que n sei onde faz
-     */
-    public function show(Request $request)
+    use Errors;
+
+    public function show()
     {
-        $user = auth()->user()->USUARIO_ID;
+        try {
+            $userId = auth()->user()->USUARIO_ID;
+            $cart = Carrinho::where('USUARIO_ID', $userId)
+                ->join('PRODUTO', 'CARRINHO_ITEM.PRODUTO_ID', '=', 'PRODUTO.PRODUTO_ID')
+                ->get();
 
-        $cart = Carrinho::where('USUARIO_ID', $user)
-                            ->join('PRODUTO',);
-
-        return response()->json([
-            'status' => 200,
-            'data'   => $cart
-        ]);
-
-        if ($cart) {
-        } else {
+            if (count($cart) > 0) {
+                return response()->json([
+                    'status'    => 200,
+                    'message'   => 'Carrinho retornado com sucesso!',
+                    'data'      => [
+                        'user'  => [
+                            'id'    => $userId
+                        ],
+                        'cart'      => CarrinhoResource::collection($cart)
+                    ]
+                ], 200);
+            } else {
+                return response()->json([
+                    'status'    => 200,
+                    'message'   => 'O carrinho informado não existe',
+                    'data'      => null
+                ], 200);
+            }
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
         }
-
-        dd($cart);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(CarrinhoRequest $request)
     {
-        $data_validation = Validator::make($request->only(['product', 'qtd']), [
-            'product' => 'required|numeric|gt:0',
-            'qtd'     => 'required|numeric|gte:0'
-        ], [
-            'product.required' => 'Campo de produto é obrigatorio',
-            'product.numeric'  => 'O campo de produto precisa ser numerico',
-            'qtd.required'     => 'Campo de quantidade é Obrigatorio',
-            'qtd.numeric'      => 'O campo de quantidade precisa ser numerico',
-            'gt'               => 'O campo de produto precisa ter o valor maior que 0',
-            'gte'              => 'O campo de quantidade precisa ter o valor maior ou igual a 0'
-        ]);
+        try {
+            $productId = round($request['product']);
+            $qtd       = round($request['qtd']);
 
-        if ($data_validation->fails()) {
-            return response()->json([
-                'status' => 401,
-                'errors' => $data_validation->errors()
-            ], 401);
-        }
+            $cart = Carrinho::where([
+                'USUARIO_ID' => auth()->user()->USUARIO_ID,
+                'PRODUTO_ID' => $productId
+            ])->first(); //encontra um produto no carrinho.
 
-        $productId = $request->input('product');
-        $qtd       = $request->input('qtd');
+            $product = Produto::ativos()->where('PRODUTO_ID', $productId)->get();
 
-        $cart = Carrinho::where([
-            'USUARIO_ID' => Auth::user()->USUARIO_ID,
-            'PRODUTO_ID' => $productId
-        ])->first();
+            if($cart || count($product) === 0) {
+                return response()->json([
+                    'status'    => 500,
+                    'message'   => 'Não foi possível inserir o produto no carrinho.',
+                    'data'      => null
+                ], 500);
+            }
 
-        if ($cart) {
             $estoque = Produto::ativos()->where('PRODUTO_ID', $productId)->first()->estoque->PRODUTO_QTD;
 
-            if ($qtd > 0) //se o estoque for maior que a soma
-                $cart->update(['ITEM_QTD' => $qtd > $estoque ? $estoque : $qtd]);
-            else
-                $cart->update(['ITEM_QTD' => 0]);
-        } else {
-            try {
-                Carrinho::create([
-                    'USUARIO_ID' => Auth::user()->USUARIO_ID,
-                    'PRODUTO_ID' => $productId,
-                    'ITEM_QTD'   => $request->qtd
-                ]);
-            } catch (\Error $err) {
-                return response()->json([
-                    'status' => 401,
-                    'errors' => $err
-                ], 401);
-            }
+            $cart = new Carrinho();
+
+            $cart->USUARIO_ID   = auth()->user()->USUARIO_ID;
+            $cart->PRODUTO_ID   = $productId;
+            $cart->ITEM_QTD     = $qtd > $estoque ? $estoque : $qtd;
+
+            $cart->save();
+
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Produto inserido no carrinho com sucesso!',
+                'data'      => new CarrinhoResource($cart)
+            ], 200);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
         }
-
-        return response()->json([
-            'status' => 201
-        ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Carrinho $carrinho)
+    public function update(CarrinhoRequest $request)
     {
-        //
-    }
+        try {
+            $productId = round($request['product']);
+            $qtd       = round($request['qtd']);
 
-    public function deleteOne(Request $request)
-    {
-    }
+            $cart = Carrinho::where([
+                'USUARIO_ID' => auth()->user()->USUARIO_ID,
+                'PRODUTO_ID' => $productId
+            ])->first();
 
-    public function deleteAll(Request $request)
-    {
+            if ($cart) { //se tiver carrinho
+                $estoque = Produto::ativos()->where('PRODUTO_ID', $productId)->first()->estoque->PRODUTO_QTD;
+
+                if ($qtd > 0) //se o estoque for maior que a soma
+                    $cart->update(['ITEM_QTD' => $qtd > $estoque ? $estoque : $qtd]);
+                else
+                    $cart->update(['ITEM_QTD' => 0]);
+
+                return response()->json([
+                    'status'    => 200,
+                    'message'   => 'Produto atualizado no carrinho com sucesso!',
+                    'data'      => new CarrinhoResource($cart)
+                ], 200);
+            } else {
+                return response()->json([
+                    'status'    => 200,
+                    'message'   => 'O produto informado não existe no carrinho',
+                    'data'      => null
+                ], 200);
+            }
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
+        }
     }
 }

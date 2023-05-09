@@ -6,69 +6,70 @@ use App\Http\Resources\Api\ProdutoResource;
 use Illuminate\Http\Request;
 use App\Models\Produto;
 use App\Http\Controllers\Controller;
+use App\Traits\Exception as Errors;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class ProdutoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * TODO - Aplicar as regras de negocio
-     * TODO - Remover codigo desnecessario
-     */
+    use Errors;
+
     public function index(Request $request)
     {
-        $query = Produto::ativos();
+        try {
+            $query = Produto::ativos();
 
-        $statusMessage = 0;
-        $message = 'Todos os Produtos';
-        $products = [];
+            $statusMessage = 0;
+            $message = 'Produtos retornados com sucesso!';
+            $products = [];
 
-        $filterQuery = $request->input('filter', null);
+            $filterQuery = $request->input('filter', null);
 
-        if ($filterQuery) {
-            $filterAcceptColumns = ['categoria'];
+            if ($filterQuery) {
+                $filterAcceptColumns = ['categoria'];
 
-            [$filterColumn, $filterParam] = explode(':', $filterQuery);
+                [$filterColumn, $filterParam] = explode(':', $filterQuery);
 
-            if (in_array($filterColumn, $filterAcceptColumns)) {
-                if ($filterColumn == 'categoria') {
-                    $query->whereRelation('categoria', 'CATEGORIA_NOME', '=', $filterParam);
+                if (in_array($filterColumn, $filterAcceptColumns)) {
+                    if ($filterColumn == 'categoria') {
+                        $query->whereRelation('categoria', 'CATEGORIA_NOME', '=', $filterParam);
 
-                    $statusMessage = 200;
+                        $statusMessage = 200;
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Paramêtro de filtro invalido',
+                        'data' => null
+                    ], 400);
                 }
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Paramêtro de filtro invalido'
-                ], 400);
+                $statusMessage = 200;
             }
-        } else {
-            $statusMessage = 200;
-        }
 
-        if ($statusMessage == 200) {
-            $orderQuery = $request->input('order', null);
+            if ($statusMessage == 200) {
+                $orderQuery = $request->input('order', null);
 
-            if ($orderQuery) {
-                $orderAcceptColumns = ['nome', 'preco'];
-                $sorts = explode(',', $orderQuery);
+                if ($orderQuery) {
+                    $orderAcceptColumns = ['nome', 'preco'];
+                    $sorts = explode(',', $orderQuery);
 
-                foreach ($sorts as $sortColumn) {
-                    $sortDirection = $orderQuery[0] == '-' ? 'DESC' : 'ASC';
-                    $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do comeco da string 
+                    foreach ($sorts as $sortColumn) {
+                        $sortDirection = $orderQuery[0] == '-' ? 'DESC' : 'ASC';
+                        $sortColumn = ltrim($sortColumn, '-'); //retira espaco em branco ou outro caracter do começo da string
 
-                    if (in_array($sortColumn, $orderAcceptColumns)) {
-                        $sortColumn == 'nome' && $query->orderBy('PRODUTO_NOME', $sortDirection);
-                        $sortColumn == 'preco' && $query->orderBy('PRODUTO_PRECO', $sortDirection);
+                        if (in_array($sortColumn, $orderAcceptColumns)) {
+                            $sortColumn == 'nome' && $query->orderBy('PRODUTO_NOME', $sortDirection);
+                            $sortColumn == 'preco' && $query->orderBy('PRODUTO_PRECO', $sortDirection);
+                        }
                     }
                 }
             }
-        }
 
-        $page = ctype_digit($request->input('page')) ? $request->input('page') : 1;
+            $page = ctype_digit($request->input('page')) ? $request->input('page') : 1;
 
-        $productsPerPage = 10;
+            $productsPerPage = 10;
 
-        try {
             $query->offset(($page - 1) * $productsPerPage)->limit($productsPerPage);
             $products = $query->get();
 
@@ -78,85 +79,65 @@ class ProdutoController extends Controller
             $meta = [
                 'total_pages'    => $numberOfPages,
                 'total_items'    => $totalOfProducts,
-                'current_page'   => $page,
+                'current_page'   => intval($page),
                 'items_per_page' => $productsPerPage
             ];
 
             return response()->json([
-                "status"  => $statusMessage,
-                "message" => $message,
-                "meta"    => $meta,
-                "data"    => ProdutoResource::collection($products)
+                'status'  => $statusMessage,
+                'message' => $message,
+                'meta'    => $meta,
+                'data'    => ProdutoResource::collection($products)
             ]);
-        } catch (\Exception $err) {
-            //TODO - Fazer a verificacao de erro
-            $classError = get_class($err);
-
-            return response()->json([
-                "status"  => 500,
-                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
-            ]);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
         }
     }
 
-
-    /**
-     * Display the specified resource.
-     * TODO - Analisar a validacao dps, to com sono
-     */
     public function show(Request $request)
     {
-        if (!ctype_digit($request->id)) {
-            return response()->json([
-                'status'  => 400,
-                'message' => 'O parametro precisar ser numerico'
-            ], 400);
-        }
-
         try {
             $product = Produto::ativos()->where('PRODUTO_ID', $request->id)->get();
 
-            return response()->json([
-                "status"    => 200,
-                "message"   => null,
-                "data"      => ProdutoResource::collection($product)
-            ]);
-        } catch (\Exception $err) {
-            //TODO - Fazer a verificacao de erro
-            $classError = get_class($err);
+            if(count($product) === 0) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => 'Não foi possível encontrar o produto informado.',
+                    'data'      => null
+                ], 404);
+            }
 
             return response()->json([
-                "status"  => 500,
-                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
+                'status'    => 200,
+                'message'   => 'Produto retornado com sucesso!',
+                'data'      => ProdutoResource::collection($product)
             ]);
-        } 
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
+        }
     }
 
-    /**
-     * 
-     * TODO - Fazer validações e tratamento de erros
-     */
     public function search(Request $request)
     {
-        $query = $request->name; 
-        
         try {
-            $product = Produto::ativos()->where('PRODUTO_NOME', 'like', '%' . $query . '%')->get();
+            $query = $request->name;
+            $product = Produto::ativos()->where('PRODUTO_NOME', 'LIKE', '%' . $query . '%')->get();
+
+            if(count($product) === 0) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => "A pesquisa por $query não encontrou resultados correspondentes.",
+                    'data'      => null
+                ], 404);
+            }
 
             return response()->json([
                 'status'  => 200,
                 'message' => "A pesquisa por $query resultou em:",
                 'data'    => ProdutoResource::collection($product)
             ], 200);
-
-        } catch (\Exception $err) {
-            //TODO - Fazer a verificacao de erro
-            $classError = get_class($err);
-
-            return response()->json([
-                "status"  => 500,
-                "message" => "Ops! Ocorreu um erro, por favor tente novamente."
-            ]);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
         }
     }
 }

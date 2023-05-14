@@ -15,22 +15,20 @@ class ProdutoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'product' => [
-                'id'            => $this->PRODUTO_ID,
-                'name'          => $this->PRODUTO_NOME,
-                'description'   => $this->PRODUTO_DESC,
-                'price'         => $this->PRODUTO_PRECO,
-                'discount'      => $this->PRODUTO_DESCONTO,
+            'id'            => $this->PRODUTO_ID,
+            'name'          => $this->PRODUTO_NOME,
+            'description'   => $this->PRODUTO_DESC,
+            'price'         => $this->PRODUTO_PRECO,
+            'discount'      => $this->PRODUTO_DESCONTO,
 
-                'category' => [
-                    'id'            => $this->categoria->CATEGORIA_ID,
-                    'name'          => $this->categoria->CATEGORIA_NOME,
-                    'description'   => $this->categoria->CATEGORIA_DESC,
-                ],
+            'category' => [
+                'id'            => $this->categoria->CATEGORIA_ID,
+                'name'          => $this->categoria->CATEGORIA_NOME,
+                'description'   => $this->categoria->CATEGORIA_DESC,
+            ],
 
-                'images'    => ImagensResource::collection($this->imagens),
-                'stock'     => $this->estoque->PRODUTO_QTD
-            ]
+            'images'    => ImagensResource::collection($this->imagens),
+            'stock'     => $this->estoque->PRODUTO_QTD
         ];
     }
 }

@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\Produto;
 use App\Http\Controllers\Controller;
 use App\Traits\Exception as Errors;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class ProdutoController extends Controller
 {

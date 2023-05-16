@@ -15,12 +15,10 @@ class CategoriaResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'category' => [
                 'id' => $this->CATEGORIA_ID,
                 'nome' => $this->CATEGORIA_NOME,
                 'desc' => $this->CATEGORIA_DESC,
                 'active' => $this->CATEGORIA_ATIVO
-            ],
         ];
     }
 }

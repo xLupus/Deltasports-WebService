@@ -48,22 +48,29 @@ class PedidoController extends Controller
     
             $produtosCarrinho = Carrinho::where('USUARIO_ID', Auth::user()->USUARIO_ID)
                 ->where('ITEM_QTD', '>', 0)->get()->all();
-    
+            if (count($produtosCarrinho) === 0) {
+                return response()->json([
+                    'status'    => 500,
+                    'message'   => 'Não existem items no carrinho.',
+                    'data'      => null
+                ], 500);
+            }
             $pedido = Pedido::create([
                 'USUARIO_ID'  => Auth::user()->USUARIO_ID,
-                'STATUS_ID'   => 1, //pendente
+                'STATUS_ID'   => 2, //pendente
                 'PEDIDO_DATA' => $dataCompra->format('Y-m-d')
             ]);
     
             if ( isset($pedido->PEDIDO_ID) ) {
                 foreach ($produtosCarrinho as $product) {
+                    $desconto = $product->product->PRODUTO_PRECO - $product->product->PRODUTO_DESCONTO;
                     PedidoItem::create([
                         'PRODUTO_ID' => $product->PRODUTO_ID,
                         'PEDIDO_ID'  => $pedido->PEDIDO_ID,
-                        'ITEM_QTD'   => $product->ITEM_QTD,
-                        'ITEM_PRECO' => $product->produto->PRODUTO_PRECO - $product->produto->PRODUTO_DESCONTO
+                        'ITEM_QTD'   => $product->ITEM_QTD < 0 ? 0 : $product->ITEM_QTD, 
+                        'ITEM_PRECO' => $desconto < 0 ? 0 : $desconto
                     ]);
-    
+                    
                     $estoqueAtual = ProdutoEstoque::where('PRODUTO_ID', $product->PRODUTO_ID)->first()->PRODUTO_QTD;
     
                     ProdutoEstoque::where('PRODUTO_ID',  $product->PRODUTO_ID)
@@ -77,8 +84,7 @@ class PedidoController extends Controller
 
             return response()->json([
                 'status'    => 200,
-                'message'   => 'Produto inserido no carrinho com sucesso!',
-                'data'      => new $pedido->PEDIDO_ID
+                'message'   => 'Pedido realizado com sucesso!'
             ], 200);
 
         } catch (\Throwable $err) {

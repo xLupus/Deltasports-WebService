@@ -15,10 +15,10 @@ class ImagensResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->IMAGEM_ID ?? null,
-            'order' => $this->IMAGEM_ORDEM ?? null,
-            'url' => $this->IMAGEM_URL ?? null,
-            'product' => $this->PRODUTO_ID ?? null
+            'id'            => $this->IMAGEM_ID ?? null,
+            'order'         => $this->IMAGEM_ORDEM ?? null,
+            'url'           => $this->IMAGEM_URL ?? null,
+            'product_id'    => $this->PRODUTO_ID ?? null
         ];
     }
 }

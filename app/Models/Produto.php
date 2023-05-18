@@ -18,9 +18,9 @@ class Produto extends Model
     public static function ativos()
     {
         return Produto::with(['categoria', 'imagens', 'estoque'])
-                            ->where('PRODUTO_ATIVO', TRUE)
-                            ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)
-                            ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0);
+            ->where('PRODUTO_ATIVO', TRUE)                            
+            ->whereRelation('categoria', 'CATEGORIA_ATIVO', TRUE)
+            ->whereRelation('estoque', 'PRODUTO_QTD', '>', 0);
     }
 
     public function categoria()
@@ -30,8 +30,7 @@ class Produto extends Model
 
     public function imagens()
     {
-        return $this->hasMany(ProdutoImagem::class, 'PRODUTO_ID')
-                    ->orderBy('IMAGEM_ORDEM', 'ASC');
+        return $this->hasMany(ProdutoImagem::class, 'PRODUTO_ID')->orderBy('IMAGEM_ORDEM', 'ASC');
     }
 
     public function estoque()

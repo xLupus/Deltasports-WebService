@@ -19,7 +19,7 @@ Route::controller(AuthController::class)->group(function () {
 
         Route::controller(ProdutoController::class)->group(function () {
             Route::get('/products', 'index');
-            Route::get('/product/search/{name}', 'search');
+            Route::get('/products/search/{name}', 'search');
             Route::get('/product/{id}', 'show');
         });
 

@@ -21,7 +21,7 @@ class CarrinhoResource extends JsonResource
                 'name' => $this->PRODUTO_NOME,
                 'description' => $this->PRODUTO_DESC,
                 'price' => $this->PRODUTO_PRECO,
-                'discount' => $this->PRODUTO_DESCONTO,
+                'discount' => $this->PRODUTO_DESCONTO
             ];
         } else {
             return [
@@ -29,6 +29,5 @@ class CarrinhoResource extends JsonResource
                 'qtd' => $this->ITEM_QTD
             ];
         }
-
     }
 }

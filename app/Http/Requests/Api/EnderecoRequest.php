@@ -5,7 +5,6 @@ namespace App\Http\Requests\Api;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Rule;
 use App\Models\Endereco;
 
 class EnderecoRequest extends FormRequest
@@ -26,13 +25,13 @@ class EnderecoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|max:70|not_regex:/[^A-Za-z ]/',
-            'street' => 'required|max:70|not_regex:/[^A-Za-z ]/',
-            'number' => 'required|max:10',
-            'complement' => 'max:70',
-            'zip_code' => 'required|regex:/^\d{8}/',
-            'city' => 'required|max:70|not_regex:/[0-9]/',
-            'state' => 'required|max:2|not_regex:/[0-9 ]/'
+            'name'          => 'required|max:70|not_regex:/[^A-Za-z ]/',
+            'street'        => 'required|max:70|not_regex:/[^A-Za-z ]/',
+            'number'        => 'required|max:10',
+            'complement'    => 'max:70',
+            'zip_code'      => 'required|regex:/^\d{8}/',
+            'city'          => 'required|max:70|not_regex:/[0-9]/',
+            'state'         => 'required|max:2|not_regex:/[0-9 ]/'
         ];
     }
 

@@ -30,7 +30,7 @@ class EnderecoRequest extends FormRequest
             'street' => 'required|max:70|not_regex:/[^A-Za-z ]/',
             'number' => 'required|max:10',
             'complement' => 'max:70',
-            'zip_code' => 'required|regex:/^\d{5}\d{3}/',
+            'zip_code' => 'required|regex:/^\d{8}/',
             'city' => 'required|max:70|not_regex:/[0-9]/',
             'state' => 'required|max:2|not_regex:/[0-9 ]/'
         ];
@@ -79,6 +79,8 @@ class EnderecoRequest extends FormRequest
             ->where('ENDERECO_COMPLEMENTO', $this->complement)
             ->where('ENDERECO_CEP', $this->zip_code)
             ->where('ENDERECO_CIDADE', $this->city)
-            ->where('ENDERECO_ESTADO', $this->state)->get();
+            ->where('ENDERECO_ESTADO', $this->state)
+            ->where('ENDERECO_APAGADO', 0)
+            ->get();
     }
 }

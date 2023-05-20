@@ -59,10 +59,10 @@ class EnderecoController extends Controller
             $endereco->save();
 
             return response()->json([
-                'status'    => 200,
+                'status'    => 201,
                 'message'   => 'Endereço cadastrado com sucesso!',
                 'data'      => new EnderecoResource($endereco)
-            ]);
+            ], 201);
         } catch (\Throwable $err) {
             return $this->exceptions($err);
         }

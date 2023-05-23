@@ -36,6 +36,7 @@ Route::controller(AuthController::class)->group(function () {
 
         Route::controller(EnderecoController::class)->group(function () {
             Route::get('/user/addresses', 'index');
+            Route::get('/user/address/{id}', 'show');
             Route::post('/user/address', 'store');
             Route::patch('/user/address/{id}', 'update');
             Route::delete('/user/address/{id}', 'destroy');

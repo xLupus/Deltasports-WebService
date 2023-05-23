@@ -14,34 +14,6 @@ class EnderecoController extends Controller
 
     /**
      * Display the specified resource.
-    */
-    public function show($enderecoId) {
-        try {
-            $endereco = Endereco::where('ENDERECO_ID', $enderecoId)
-            ->where('ENDERECO_APAGADO', 0)
-            ->where('USUARIO_ID', auth()->user()->USUARIO_ID)
-            ->first();
-
-            if(!$endereco) {
-                return response()->json([
-                    'status'    => 404,
-                    'message'   => 'Endereço não encontrado',
-                    'data'      => null
-                ], 404);
-            }
-
-            return response()->json([
-                'status'    => 200,
-                'message'   => 'Endereço retornado com sucesso!',
-                'data'      => new EnderecoResource($endereco)
-            ]);
-        } catch (\Throwable $err) {
-            return $this->exceptions($err);
-        }
-    }
-
-    /**
-     * Display the specified resource.
      */
     public function index()
     {
@@ -62,6 +34,34 @@ class EnderecoController extends Controller
                 'status'    => 200,
                 'message'   => 'Endereços retornados com sucesso!',
                 'data'      => EnderecoResource::collection($enderecos)
+            ]);
+        } catch (\Throwable $err) {
+            return $this->exceptions($err);
+        }
+    }
+    
+    /**
+     * Display the specified resource.
+    */
+    public function show($enderecoId) {
+        try {
+            $endereco = Endereco::where('ENDERECO_ID', $enderecoId)
+                ->where('ENDERECO_APAGADO', 0)
+                ->where('USUARIO_ID', auth()->user()->USUARIO_ID)
+                ->first();
+
+            if(!$endereco) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => 'Endereço não encontrado',
+                    'data'      => null
+                ], 404);
+            }
+
+            return response()->json([
+                'status'    => 200,
+                'message'   => 'Endereço retornado com sucesso!',
+                'data'      => new EnderecoResource($endereco)
             ]);
         } catch (\Throwable $err) {
             return $this->exceptions($err);

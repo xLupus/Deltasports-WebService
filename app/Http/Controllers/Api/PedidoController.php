@@ -13,7 +13,6 @@ use App\Models\ProdutoEstoque;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\Exception as Errors;
 
-
 class PedidoController extends Controller
 {
     use Errors;
@@ -21,18 +20,17 @@ class PedidoController extends Controller
     public function index()
     {
         try {
-            $pedidos = Pedido::where('USUARIO_ID', Auth::user()->USUARIO_ID)->get();
+            $pedidos = Pedido::where('USUARIO_ID', auth()->user()->USUARIO_ID)->get();
 
             return response()->json([
-             'status'     => 200,
-             'message'    => null,
-             'data' => $pedidos
-             ]);
-             
+                'status'    => 200,
+                'message'   => 'Pedidos retornados com sucesso!',
+                'data'      => $pedidos
+            ]);
+
         } catch (\Throwable $err) {
             return $this->exceptions($err);
         }
-
     }
 
     /**
@@ -45,37 +43,42 @@ class PedidoController extends Controller
     {
         try{
             $dataCompra = new \DateTime('', new \DateTimeZone('America/Sao_Paulo'));
-    
-            $produtosCarrinho = Carrinho::where('USUARIO_ID', Auth::user()->USUARIO_ID)
-                ->where('ITEM_QTD', '>', 0)->get()->all();
+
+            $produtosCarrinho = Carrinho::where('USUARIO_ID', auth()->user()->USUARIO_ID)
+                ->where('ITEM_QTD', '>', 0)
+                ->get()
+                ->all();
+
             if (count($produtosCarrinho) === 0) {
                 return response()->json([
-                    'status'    => 500,
+                    'status'    => 404,
                     'message'   => 'Não existem items no carrinho.',
                     'data'      => null
-                ], 500);
+                ], 404);
             }
+
             $pedido = Pedido::create([
-                'USUARIO_ID'  => Auth::user()->USUARIO_ID,
+                'USUARIO_ID'  => auth()->user()->USUARIO_ID,
                 'STATUS_ID'   => 2, //pendente
                 'PEDIDO_DATA' => $dataCompra->format('Y-m-d')
             ]);
-    
+
             if ( isset($pedido->PEDIDO_ID) ) {
                 foreach ($produtosCarrinho as $product) {
                     $desconto = $product->product->PRODUTO_PRECO - $product->product->PRODUTO_DESCONTO;
+
                     PedidoItem::create([
                         'PRODUTO_ID' => $product->PRODUTO_ID,
                         'PEDIDO_ID'  => $pedido->PEDIDO_ID,
-                        'ITEM_QTD'   => $product->ITEM_QTD < 0 ? 0 : $product->ITEM_QTD, 
+                        'ITEM_QTD'   => $product->ITEM_QTD < 0 ? 0 : $product->ITEM_QTD,
                         'ITEM_PRECO' => $desconto < 0 ? 0 : $desconto
                     ]);
-                    
+
                     $estoqueAtual = ProdutoEstoque::where('PRODUTO_ID', $product->PRODUTO_ID)->first()->PRODUTO_QTD;
-    
+
                     ProdutoEstoque::where('PRODUTO_ID',  $product->PRODUTO_ID)
                         ->update(['PRODUTO_QTD' => $estoqueAtual - $product->ITEM_QTD]);
-    
+
                     Carrinho::where('USUARIO_ID', Auth::user()->USUARIO_ID)
                         ->where('PRODUTO_ID',  $product->PRODUTO_ID)
                         ->update(['ITEM_QTD' => 0]);
@@ -84,9 +87,9 @@ class PedidoController extends Controller
 
             return response()->json([
                 'status'    => 200,
-                'message'   => 'Pedido realizado com sucesso!'
+                'message'   => 'Pedido realizado com sucesso!',
+                'data'      => null
             ], 200);
-
         } catch (\Throwable $err) {
             return $this->exceptions($err);
         }
@@ -104,21 +107,26 @@ class PedidoController extends Controller
             $precoTotal = 0;
             // $endereco   = Endereco::where('USUARIO_ID', Auth::user()->USUARIO_ID)->get()->last()
             $items      = PedidoItem::where('PEDIDO_ID', $request->id)->get();
-            if (!isset($items[0]) || $items[0]->pedido->USUARIO_ID != Auth::user()->USUARIO_ID)
+
+            if (!isset($items[0]) || $items[0]->pedido->USUARIO_ID != auth()->user()->USUARIO_ID) {
                 return response()->json([
-                    'status'      => 200,
-                    'teste'   => $items
-                ]);
-    
+                    'status'    => 404,
+                    'message'   => 'Pedido não encontrado',
+                    'data'      => null
+                ], 404);
+            }
+
             foreach ($items as $item)
                 $precoTotal += $item->ITEM_QTD * $item->ITEM_PRECO;
-    
+  
             return response()->json([
-                'items'      => $items,
-                'precoTotal' => $precoTotal,
-                // 'endereco'   => $endereco
+                'status'        => 200,
+                'message'       => 'Pedido retornado com sucesso!',
+                'data'          => [
+                    'items' => $items,
+                    'total' => $precoTotal
+                ]                   // 'endereco'   => $endereco
             ]);
-
         } catch (\Throwable $err) {
             return $this->exceptions($err);
         }

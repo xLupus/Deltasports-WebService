@@ -25,7 +25,7 @@ class EnderecoController extends Controller
             if(count($enderecos) === 0) {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Não há endereços cadastrados',
+                    'message'   => 'Nenhum endereço encontrado...',
                     'data'      => null
                 ], 404);
             }
@@ -39,7 +39,7 @@ class EnderecoController extends Controller
             return $this->exceptions($err);
         }
     }
-    
+
     /**
      * Display the specified resource.
     */
@@ -53,7 +53,7 @@ class EnderecoController extends Controller
             if(!$endereco) {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Endereço não encontrado',
+                    'message'   => 'Endereço não encontrado...',
                     'data'      => null
                 ], 404);
             }
@@ -112,7 +112,7 @@ class EnderecoController extends Controller
             if(!$endereco) {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Endereço não encontrado',
+                    'message'   => 'Endereço não encontrado...',
                     'data'      => null
                 ], 404);
             }
@@ -151,7 +151,7 @@ class EnderecoController extends Controller
             if(!$endereco) {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Endereço não encontrado',
+                    'message'   => 'Endereço não encontrado...',
                     'data'      => null
                 ], 404);
             }
@@ -162,7 +162,7 @@ class EnderecoController extends Controller
 
             return response()->json([
                 'status'    => 200,
-                'message'   => 'Endereço apagado com sucesso!',
+                'message'   => 'Endereço removido com sucesso!',
                 'data'      => null
             ]);
         } catch (\Throwable $err) {

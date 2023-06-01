@@ -9,8 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\CategoriaResource;
 use App\Http\Resources\Api\ProdutoResource;
 use App\Traits\Exception as Errors;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class CategoriaController extends Controller
 {

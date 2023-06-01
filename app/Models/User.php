@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -38,6 +37,12 @@ class User extends Authenticatable implements JWTSubject
         'USUARIO_SENHA',
         //'remember_token',
     ];
+
+
+    public function endereco()
+    {
+        return $this->hasMany(Endereco::class, 'USUARIO_ID');
+    }
 
     /**
      * The attributes that should be cast.
@@ -71,5 +76,7 @@ class User extends Authenticatable implements JWTSubject
     public function getAuthPassword() {
         return $this->USUARIO_SENHA; //coluna real que 'substitui' a coluna 'password'
     }
+
+
 }
 

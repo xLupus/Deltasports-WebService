@@ -57,7 +57,7 @@ class CarrinhoController extends Controller
             ])->first(); //encontra um produto no carrinho.
 
             $product = Produto::ativos()->where('PRODUTO_ID', $productId)->get();
-            
+
             if (count($product) === 0) {
                 return response()->json([
                     'status'    => 500,
@@ -67,23 +67,24 @@ class CarrinhoController extends Controller
             }
 
             $estoque = Produto::where('PRODUTO_ID', $productId)->first()->estoque->PRODUTO_QTD;
+            
             if ($cart) {
-    
+
                 if ($request->qtd > 0) //se o estoque for maior que a soma
                     $cart->update(['ITEM_QTD' => $request->qtd > $estoque ? $estoque : $request->qtd]);
                 else
                     $cart->update(['ITEM_QTD' => 0]);
-    
+
             } else {
                 $cart = new Carrinho();
 
                 $cart->USUARIO_ID   = auth()->user()->USUARIO_ID;
                 $cart->PRODUTO_ID   = $productId;
                 $cart->ITEM_QTD     = $qtd > $estoque ? $estoque : $qtd;
-    
+
                 $cart->save();
             }
-            
+
             return response()->json([
                 'status'    => 200,
                 'message'   => 'Produto inserido no carrinho com sucesso!',
@@ -121,10 +122,10 @@ class CarrinhoController extends Controller
                 ], 200);
             } else {
                 return response()->json([
-                    'status'    => 200,
+                    'status'    => 404,
                     'message'   => 'O produto informado não existe no carrinho',
                     'data'      => null
-                ], 200);
+                ], 404);
             }
         } catch (\Throwable $err) {
             return $this->exceptions($err);

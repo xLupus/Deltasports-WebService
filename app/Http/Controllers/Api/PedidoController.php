@@ -108,13 +108,14 @@ class PedidoController extends Controller
     {
         try{
             $precoTotal = 0;
+            $pedidoId   = intval($request->id);
 
             $endereco   = Endereco::where('ENDERECO_APAGADO', 0)
                 ->where('USUARIO_ID', auth()->user()->USUARIO_ID)
                 ->get()
                 ->last();
 
-            $items      = PedidoItem::where('PEDIDO_ID', $request->id)->get();
+            $items      = PedidoItem::where('PEDIDO_ID', $pedidoId)->get();
 
             if (!isset($items[0]) || $items[0]->pedido->USUARIO_ID != auth()->user()->USUARIO_ID) {
                 return response()->json([
@@ -131,6 +132,7 @@ class PedidoController extends Controller
                 'status'        => 200,
                 'message'       => 'Pedido retornado com sucesso!',
                 'data'          => [
+                    'id'            => $pedidoId,
                     'items'         => PedidoShowResource::collection($items),
                     'address'       => new EnderecoResource($endereco),
                     'total_price'   => $precoTotal

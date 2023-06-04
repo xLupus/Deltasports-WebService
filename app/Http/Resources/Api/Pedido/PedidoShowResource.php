@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\Pedido;
 
+use App\Http\Resources\Api\ProdutoResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,12 +16,12 @@ class PedidoShowResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'            => $this->PEDIDO_ID,
-            'product_id'    => $this->PRODUTO_ID,
             'qtd'           => $this->ITEM_QTD,
             'price'         => $this->ITEM_PRECO,
             'status'        => $this->pedido->STATUS_ID,
             'date'          => $this->pedido->PEDIDO_DATA,
+
+            'product'       => new ProdutoResource($this->itens)
         ];
     }
 }

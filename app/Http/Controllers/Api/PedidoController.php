@@ -25,6 +25,14 @@ class PedidoController extends Controller
         try {
             $pedidos = Pedido::where('USUARIO_ID', auth()->user()->USUARIO_ID)->get();
 
+            if(count($pedidos) === 0) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => 'Nenhum pedido foi encontrado ...',
+                    'data'      => null
+                ], 404);
+            }
+
             return response()->json([
                 'status'    => 200,
                 'message'   => 'Pedidos retornados com sucesso!',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\Pedido;
 
+use App\Http\Resources\Api\ProdutoResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,9 @@ class PedidoIndexResource extends JsonResource
         return [
             'id'            => $this->PEDIDO_ID,
             'status'        => $this->STATUS_ID,
-            'date'          => $this->PEDIDO_DATA
+            'date'          => $this->PEDIDO_DATA,
+
+            'product'       => new ProdutoResource($this->itens[0]->itens)
         ];
     }
 }

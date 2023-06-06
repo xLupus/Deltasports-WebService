@@ -7,7 +7,6 @@ use App\Http\Resources\Api\EnderecoResource;
 use Illuminate\Http\Request;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
-use App\Models\PedidoStatus;
 use App\Http\Resources\Api\Pedido\PedidoIndexResource;
 use App\Http\Resources\Api\Pedido\PedidoShowResource;
 use App\Models\Endereco;
@@ -40,6 +39,7 @@ class PedidoController extends Controller
             ]);
 
         } catch (\Throwable $err) {
+            dd($err);
             return $this->exceptions($err);
         }
     }

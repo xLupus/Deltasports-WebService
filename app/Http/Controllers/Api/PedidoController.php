@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\EnderecoResource;
 use Illuminate\Http\Request;
 use App\Models\Pedido;
 use App\Models\PedidoItem;
-use App\Models\PedidoStatus;
+use App\Http\Resources\Api\Pedido\PedidoIndexResource;
+use App\Http\Resources\Api\Pedido\PedidoShowResource;
 use App\Models\Endereco;
 use App\Models\Carrinho;
 use App\Models\ProdutoEstoque;
@@ -22,13 +24,22 @@ class PedidoController extends Controller
         try {
             $pedidos = Pedido::where('USUARIO_ID', auth()->user()->USUARIO_ID)->get();
 
+            if(count($pedidos) === 0) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => 'Nenhum pedido foi encontrado ...',
+                    'data'      => null
+                ], 404);
+            }
+
             return response()->json([
                 'status'    => 200,
                 'message'   => 'Pedidos retornados com sucesso!',
-                'data'      => $pedidos
+                'data'      => PedidoIndexResource::collection($pedidos)
             ]);
 
         } catch (\Throwable $err) {
+            dd($err);
             return $this->exceptions($err);
         }
     }
@@ -39,7 +50,7 @@ class PedidoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
         try{
             $dataCompra = new \DateTime('', new \DateTimeZone('America/Sao_Paulo'));
@@ -105,27 +116,34 @@ class PedidoController extends Controller
     {
         try{
             $precoTotal = 0;
-            // $endereco   = Endereco::where('USUARIO_ID', Auth::user()->USUARIO_ID)->get()->last()
-            $items      = PedidoItem::where('PEDIDO_ID', $request->id)->get();
+            $pedidoId   = intval($request->id);
+
+            $endereco   = Endereco::where('USUARIO_ID', auth()->user()->USUARIO_ID)
+                ->get()
+                ->last();
+
+            $items      = PedidoItem::where('PEDIDO_ID', $pedidoId)->get();
 
             if (!isset($items[0]) || $items[0]->pedido->USUARIO_ID != auth()->user()->USUARIO_ID) {
                 return response()->json([
                     'status'    => 404,
-                    'message'   => 'Pedido não encontrado',
+                    'message'   => 'Pedido não encontrado...',
                     'data'      => null
                 ], 404);
             }
 
             foreach ($items as $item)
                 $precoTotal += $item->ITEM_QTD * $item->ITEM_PRECO;
-  
+
             return response()->json([
                 'status'        => 200,
                 'message'       => 'Pedido retornado com sucesso!',
                 'data'          => [
-                    'items' => $items,
-                    'total' => $precoTotal
-                ]                   // 'endereco'   => $endereco
+                    'id'            => $pedidoId,
+                    'items'         => PedidoShowResource::collection($items),
+                    'address'       => new EnderecoResource($endereco),
+                    'total_price'   => $precoTotal
+                ]
             ]);
         } catch (\Throwable $err) {
             return $this->exceptions($err);

@@ -118,8 +118,7 @@ class PedidoController extends Controller
             $precoTotal = 0;
             $pedidoId   = intval($request->id);
 
-            $endereco   = Endereco::where('ENDERECO_APAGADO', 0)
-                ->where('USUARIO_ID', auth()->user()->USUARIO_ID)
+            $endereco   = Endereco::where('USUARIO_ID', auth()->user()->USUARIO_ID)
                 ->get()
                 ->last();
 

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PedidoItem;
 use App\Models\PedidoStatus;
-use Illuminate\Support\Facades\Auth;
 
 class Pedido extends Model
 {

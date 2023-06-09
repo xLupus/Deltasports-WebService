@@ -16,19 +16,18 @@ class CarrinhoResource extends JsonResource
     {
         if($this->PRODUTO_NOME && $this->PRODUTO_DESC && $this->PRODUTO_PRECO && $this->PRODUTO_DESCONTO) {
             return [
-                    'id' => $this->PRODUTO_ID,
-                    'qtd' => $this->ITEM_QTD,
-                    'name' => $this->PRODUTO_NOME,
-                    'description' => $this->PRODUTO_DESC,
-                    'price' => $this->PRODUTO_PRECO,
-                    'discount' => $this->PRODUTO_DESCONTO,
+                'id' => $this->PRODUTO_ID,
+                'qtd' => $this->ITEM_QTD,
+                'name' => $this->PRODUTO_NOME,
+                'description' => $this->PRODUTO_DESC,
+                'price' => $this->PRODUTO_PRECO,
+                'discount' => $this->PRODUTO_DESCONTO
             ];
         } else {
             return [
-                    'id' => $this->PRODUTO_ID,
-                    'qtd' => $this->ITEM_QTD,
+                'id' => $this->PRODUTO_ID,
+                'qtd' => $this->ITEM_QTD
             ];
         }
-
     }
 }

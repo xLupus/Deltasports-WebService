@@ -28,8 +28,8 @@ class PerfilController extends Controller
         try {
             $user = User::find(auth()->user()->USUARIO_ID);
 
-            $user->USUARIO_EMAIL = $request['email'];
-            $user->USUARIO_SENHA = bcrypt($request['password']);
+            $user->USUARIO_NOME     = $request['name'];
+            $user->USUARIO_EMAIL    = $request['email'];
 
             $user->update();
 

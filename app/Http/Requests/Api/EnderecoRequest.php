@@ -25,7 +25,7 @@ class EnderecoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'          => 'required|max:70|not_regex:/[^A-Za-z ]/',
+            'name'          => 'required|max:70',
             'street'        => 'required|max:70|not_regex:/[^A-Za-z ]/',
             'number'        => 'required|max:10',
             'complement'    => 'max:70',

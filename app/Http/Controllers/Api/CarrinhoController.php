@@ -35,10 +35,10 @@ class CarrinhoController extends Controller
                 ], 200);
             } else {
                 return response()->json([
-                    'status'    => 200,
+                    'status'    => 404,
                     'message'   => 'O carrinho informado não existe',
                     'data'      => null
-                ], 200);
+                ], 404);
             }
         } catch (\Throwable $err) {
             return $this->exceptions($err);
@@ -67,7 +67,7 @@ class CarrinhoController extends Controller
             }
 
             $estoque = Produto::where('PRODUTO_ID', $productId)->first()->estoque->PRODUTO_QTD;
-            
+
             if ($cart) {
 
                 if ($request->qtd > 0) //se o estoque for maior que a soma

@@ -75,23 +75,23 @@ class PedidoController extends Controller
             ]);
 
             if ( isset($pedido->PEDIDO_ID) ) {
-                foreach ($produtosCarrinho as $product) {
-                    $desconto = $product->product->PRODUTO_PRECO - $product->product->PRODUTO_DESCONTO;
+                foreach ($produtosCarrinho as $produto) {
+                    $desconto = $produto->produto->PRODUTO_PRECO - $produto->produto->PRODUTO_DESCONTO;
 
                     PedidoItem::create([
-                        'PRODUTO_ID' => $product->PRODUTO_ID,
+                        'PRODUTO_ID' => $produto->PRODUTO_ID,
                         'PEDIDO_ID'  => $pedido->PEDIDO_ID,
-                        'ITEM_QTD'   => $product->ITEM_QTD < 0 ? 0 : $product->ITEM_QTD,
+                        'ITEM_QTD'   => $produto->ITEM_QTD < 0 ? 0 : $produto->ITEM_QTD,
                         'ITEM_PRECO' => $desconto < 0 ? 0 : $desconto
                     ]);
 
-                    $estoqueAtual = ProdutoEstoque::where('PRODUTO_ID', $product->PRODUTO_ID)->first()->PRODUTO_QTD;
+                    $estoqueAtual = ProdutoEstoque::where('PRODUTO_ID', $produto->PRODUTO_ID)->first()->PRODUTO_QTD;
 
-                    ProdutoEstoque::where('PRODUTO_ID',  $product->PRODUTO_ID)
-                        ->update(['PRODUTO_QTD' => $estoqueAtual - $product->ITEM_QTD]);
+                    ProdutoEstoque::where('PRODUTO_ID',  $produto->PRODUTO_ID)
+                        ->update(['PRODUTO_QTD' => $estoqueAtual - $produto->ITEM_QTD]);
 
                     Carrinho::where('USUARIO_ID', Auth::user()->USUARIO_ID)
-                        ->where('PRODUTO_ID',  $product->PRODUTO_ID)
+                        ->where('PRODUTO_ID',  $produto->PRODUTO_ID)
                         ->update(['ITEM_QTD' => 0]);
                 }
             }

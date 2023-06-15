@@ -16,11 +16,18 @@ class CarrinhoController extends Controller
     public function show()
     {
         try {
+            $precoTotal =  $descontoTotal = 0;
+
             $userId = auth()->user()->USUARIO_ID;
             $cart = Carrinho::where('USUARIO_ID', $userId)
                 ->where('ITEM_QTD', '>', 0)
                 ->join('PRODUTO', 'CARRINHO_ITEM.PRODUTO_ID', '=', 'PRODUTO.PRODUTO_ID')
                 ->get();
+
+            foreach ($cart as $produto) {
+                $precoTotal += $produto->ITEM_QTD * $produto->PRODUTO_PRECO;
+                $descontoTotal += ($produto->PRODUTO_PRECO - $produto->PRODUTO_DESCONTO) * $produto->ITEM_QTD;
+            }
 
             if (count($cart) > 0) {
                 return response()->json([
@@ -30,15 +37,17 @@ class CarrinhoController extends Controller
                         'user'  => [
                             'id'    => $userId
                         ],
-                        'cart'      => CarrinhoResource::collection($cart)
+                        'cart'         => CarrinhoResource::collection($cart),
+                        'sub_total'    => $precoTotal,
+                        'total_price'  => $descontoTotal,
                     ]
                 ], 200);
             } else {
                 return response()->json([
-                    'status'    => 404,
+                    'status'    => 200,
                     'message'   => 'O carrinho informado não existe',
                     'data'      => null
-                ], 404);
+                ], 200);
             }
         } catch (\Throwable $err) {
             return $this->exceptions($err);

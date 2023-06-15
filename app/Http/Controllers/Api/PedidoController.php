@@ -22,7 +22,9 @@ class PedidoController extends Controller
     public function index()
     {
         try {
-            $pedidos = Pedido::where('USUARIO_ID', auth()->user()->USUARIO_ID)->get();
+            $pedidos = Pedido::where('USUARIO_ID', auth()->user()->USUARIO_ID)
+                ->orderBy('PEDIDO_ID', 'DESC')
+                ->get();
 
             if(count($pedidos) === 0) {
                 return response()->json([

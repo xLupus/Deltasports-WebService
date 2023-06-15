@@ -20,6 +20,7 @@ class EnderecoController extends Controller
         try {
             $enderecos = Endereco::where('ENDERECO_APAGADO', 0)
                 ->where('USUARIO_ID', auth()->user()->USUARIO_ID)
+                ->orderBy('ENDERECO_ID', 'DESC')
                 ->get();
 
             if(count($enderecos) === 0) {

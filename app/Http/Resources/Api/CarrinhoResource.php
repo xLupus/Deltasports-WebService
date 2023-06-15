@@ -22,6 +22,7 @@ class CarrinhoResource extends JsonResource
                 'description'   => $this->PRODUTO_DESC,
                 'price'         => $this->PRODUTO_PRECO,
                 'discount'      => $this->PRODUTO_DESCONTO,
+                'stock'         => $this->produto->estoque->PRODUTO_QTD,
                 'images'        => ImagensResource::collection($this->produto->imagens)
             ];
         } else {

@@ -44,10 +44,10 @@ class CarrinhoController extends Controller
                 ], 200);
             } else {
                 return response()->json([
-                    'status'    => 200,
+                    'status'    => 404,
                     'message'   => 'O carrinho informado não existe',
                     'data'      => null
-                ], 200);
+                ], 404);
             }
         } catch (\Throwable $err) {
             return $this->exceptions($err);
